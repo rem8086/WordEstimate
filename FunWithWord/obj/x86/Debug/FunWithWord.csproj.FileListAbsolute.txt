@@ -1,0 +1,12 @@
+C:\Users\Sergey\AppData\Local\Temporary Projects\FunWithWord\bin\Debug\FunWithWord.exe
+C:\Users\Sergey\AppData\Local\Temporary Projects\FunWithWord\bin\Debug\FunWithWord.pdb
+C:\Users\Sergey\AppData\Local\Temporary Projects\FunWithWord\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Sergey\AppData\Local\Temporary Projects\FunWithWord\obj\x86\Debug\FunWithWord.csproj.ResolveComReference.cache
+C:\Users\Sergey\AppData\Local\Temporary Projects\FunWithWord\obj\x86\Debug\FunWithWord.exe
+C:\Users\Sergey\AppData\Local\Temporary Projects\FunWithWord\obj\x86\Debug\FunWithWord.pdb
+C:\Users\Sergey\documents\visual studio 2010\Projects\FunWithWord\FunWithWord\obj\x86\Debug\FunWithWord.csproj.ResolveComReference.cache
+C:\Users\Sergey\documents\visual studio 2010\Projects\FunWithWord\FunWithWord\obj\x86\Debug\FunWithWord.exe
+C:\Users\Sergey\documents\visual studio 2010\Projects\FunWithWord\FunWithWord\obj\x86\Debug\FunWithWord.pdb
+C:\Users\Sergey\documents\visual studio 2010\Projects\FunWithWord\FunWithWord\bin\Debug\FunWithWord.exe
+C:\Users\Sergey\documents\visual studio 2010\Projects\FunWithWord\FunWithWord\bin\Debug\FunWithWord.pdb
+C:\Users\Sergey\documents\visual studio 2010\Projects\FunWithWord\FunWithWord\obj\x86\Debug\ResolveAssemblyReference.cache

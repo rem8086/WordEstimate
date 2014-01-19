@@ -1,0 +1,6 @@
+C:\Users\Sergey\documents\visual studio 2010\Projects\FunWithWord\FunWithWord\bin\Release\FunWithWord.exe
+C:\Users\Sergey\documents\visual studio 2010\Projects\FunWithWord\FunWithWord\bin\Release\FunWithWord.pdb
+C:\Users\Sergey\documents\visual studio 2010\Projects\FunWithWord\FunWithWord\obj\x86\Release\ResolveAssemblyReference.cache
+C:\Users\Sergey\documents\visual studio 2010\Projects\FunWithWord\FunWithWord\obj\x86\Release\FunWithWord.csproj.ResolveComReference.cache
+C:\Users\Sergey\documents\visual studio 2010\Projects\FunWithWord\FunWithWord\obj\x86\Release\FunWithWord.exe
+C:\Users\Sergey\documents\visual studio 2010\Projects\FunWithWord\FunWithWord\obj\x86\Release\FunWithWord.pdb
