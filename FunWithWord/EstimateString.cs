@@ -49,7 +49,7 @@ namespace FunWithWord
         string name;
         double volume;
         StringCostElements currentCost;
-        StringCostElements basicCost;
+        //StringCostElements basicCost;
 
         public EstimateString(int num)
         {

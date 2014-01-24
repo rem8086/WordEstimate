@@ -45,7 +45,6 @@
   <ItemGroup>
     <Compile Include="Estimate.cs" />
     <Compile Include="EstimateString.cs" />
-    <Compile Include="EstimateTotal.cs" />
     <Compile Include="ExcelOutput.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
