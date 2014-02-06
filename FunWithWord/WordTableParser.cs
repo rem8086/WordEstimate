@@ -1,44 +1,114 @@
-﻿using System;
+﻿//#define DEBUG
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
+
 namespace FunWithWord
 {
     class WordTableParser
     {
-        const string ISNUMBERPATTERN = "^[0-9]{1,}\\.$";
-        const int NUMBERCOLUMN = 1;
-        const string ISRESUMEPATTERN = "ИТОГО[\\s]{1,}ПО[\\s]{1,}СМЕТЕ";
-        const string ISEQUIPMENTPATTERN = "СТОИМОСТЬ[\\s]{1,}ОБОРУДОВАНИЯ";
-        const string ISTRANSPORTPATTERN = "ТРАНСПОРТНЫЕ РАСХОДЫ";
-        const string ISDEPOTPATTERN = "ЗАГОТОВИТЕЛЬНО-СКЛАДСКИЕ РАСХОДЫ";
-        const string ISTOTALPATTERN = "ВСЕГО[\\s]{1,}ПО[\\s]{1,}СМЕТЕ";
-        const string ISOVERHEADSPATTERN = "ВСЕГО НАКЛАДНЫЕ РАСХОДЫ";
-        const string ISESTIMATEPROFITPATTERN = "ВСЕГО СМЕТНАЯ ПРИБЫЛЬ";
+        const string CONFIGPATH = "config.ini";
+        const string TABLENUMBER = "TableNumber";
+        const string ISNUMBERPATTERN = "StringNumberPattern";
+        const string ISRESUMEPATTERN = "ResumeStringPattern";
+        const string ISEQUIPMENTPATTERN = "EquipmentStringPattern";
+        const string ISTRANSPORTPATTERN = "TransportCostPattern";
+        const string ISDEPOTPATTERN = "DepotCostPattern";
+        const string ISTOTALPATTERN = "TotalStringPattern";
+        const string ISOVERHEADSPATTERN = "OverheadStringPattern";
+        const string ISESTIMATEPROFITPATTERN = "EstimateProfitStringPattern";
+
+        const string ELEMENTSSCHEME = "ElementsScheme";
+        const string ESTIMATESTRINGSCHEME = "EstimateStringScheme";
+        const string RESUMETRINGSCHEME = "ResumeStringScheme";
+        const string COMMONSTRINCOSTSCHEME = "CommonStringCostScheme";
+
+        const string NUMBER = "Number";
+        const string NAME = "Name";
+        const string VOLUME = "Volume";
+        const string COST = "Cost";    
+        const string PAY = "Pay";	
+        const string MACHINE = "Machine";
+	    const string MATERIAL = "Material";
+        const string MACHINEPAY = "MachinePay";
+
         
         WordTable tableForParse;
+        Dictionary<string, string> configDictionary;
+        Dictionary<string, int> stringShiftDictionary;
+        int stringShiftFirst, stringShiftLength;
+        Dictionary<string, int> resumeShiftDictionary;
+        int resumeShiftFirst, resumeShiftLength;
+        Dictionary<string, int> costShiftDictionary;
+        int costShiftFirst, costShiftLength;
 
         public WordTableParser()
         {
             tableForParse = new WordTable();
+            ConfigParse config = new ConfigParse(CONFIGPATH);
+            configDictionary = config.Parsing();
+            ElementTemplate templ = new ElementTemplate(configDictionary[ELEMENTSSCHEME]);
+            stringShiftFirst = 0; stringShiftLength = 0;
+            stringShiftDictionary = templ.ValuesShift(configDictionary[ESTIMATESTRINGSCHEME], NUMBER, 
+                new string[] { NAME, VOLUME, COST, PAY, MACHINE, MATERIAL, MACHINEPAY }, out stringShiftFirst, out stringShiftLength);
+            resumeShiftFirst = 0; resumeShiftLength = 0;
+            resumeShiftDictionary = templ.ValuesShift(configDictionary[RESUMETRINGSCHEME], NAME,
+                new string[] { COST, PAY, MACHINE, MATERIAL, MACHINEPAY }, out resumeShiftFirst, out resumeShiftLength);
+            costShiftFirst = 0; costShiftLength = 0;
+            costShiftDictionary = templ.ValuesShift(configDictionary[COMMONSTRINCOSTSCHEME], NAME,
+                new string[] { COST }, out costShiftFirst, out costShiftLength);
+            templ.Dispose();
+#if (DEBUG)
+            #region Configuration files structure
+            Console.WriteLine("##### Configuration files #####");
+            foreach (KeyValuePair<string, string> pair in configDictionary)
+            {
+                Console.WriteLine("{0} = {1}", pair.Key, pair.Value);
+            }
+            Console.WriteLine("###### Template for {0} #####", configDictionary[ESTIMATESTRINGSCHEME]);
+            foreach (KeyValuePair<string, int> pair in stringShiftDictionary)
+            {
+                Console.WriteLine("{0} shift is {1}", pair.Key, pair.Value);
+            }
+            Console.WriteLine("Column of main element is {0}", stringShiftFirst);
+            Console.WriteLine("Length of block is {0}", stringShiftLength);
+            Console.WriteLine("###### Template for {0} #####", configDictionary[RESUMETRINGSCHEME]);
+            foreach (KeyValuePair<string, int> pair in resumeShiftDictionary)
+            {
+                Console.WriteLine("{0} shift is {1}", pair.Key, pair.Value);
+            }
+            Console.WriteLine("Column of main element is {0}", resumeShiftFirst);
+            Console.WriteLine("Length of block is {0}", resumeShiftLength);
+            Console.WriteLine("###### Template for {0} #####", configDictionary[COMMONSTRINCOSTSCHEME]);
+            foreach (KeyValuePair<string, int> pair in costShiftDictionary)
+            {
+                Console.WriteLine("{0} shift is {1}", pair.Key, pair.Value);
+            }
+            Console.WriteLine("Column of main element is {0}", costShiftFirst);
+            Console.WriteLine("Length of block is {0}", costShiftLength);
+            Console.WriteLine("###### End configuration ########");
+            #endregion
+#endif
         }
 
-        public Estimate Parsing(string filepath, int tableNumber)
+        public Estimate Parsing(string filepath)
         {
             tableForParse.ConnectToDocment(filepath);
-            tableForParse.ChooseTable(tableNumber);
-            Estimate es = new Estimate(filepath.Substring(filepath.Length - 10));
-            Console.WriteLine("Strings count: /while  don't know/ " + tableForParse.GetElementCount);
+            tableForParse.ChooseTable(Convert.ToInt32(configDictionary[TABLENUMBER]));
+            Estimate es = new Estimate(filepath.Substring(filepath.LastIndexOf("\\")+1));
             double equip = 0, depot = 0, transport = 0;
-            bool isResumeFinding = false;
+            bool isResumeFind = false;
             for (int i = 1; i < tableForParse.GetElementCount; i++)
             {
-                if ((tableForParse[i].ColumnIndex == NUMBERCOLUMN) &&
-                    (IsInScheme(RemoveUnvisibleCharacters(tableForParse[i].Range.Text), ISNUMBERPATTERN)))
+                if ((tableForParse[i].ColumnIndex != Convert.ToInt32(stringShiftFirst)) && (tableForParse[i].ColumnIndex != Convert.ToInt32(resumeShiftFirst)) &&
+                    (tableForParse[i].ColumnIndex != Convert.ToInt32(costShiftFirst))) continue;
+                if ((tableForParse[i].ColumnIndex == Convert.ToInt32(stringShiftFirst)) &&
+                    (IsInScheme(RemoveUnvisibleCharacters(tableForParse[i].Range.Text), configDictionary[ISNUMBERPATTERN])) && !(isResumeFind))
                 {
-                    Console.Write("Parse element #{0}... ", RemoveUnvisibleCharacters(tableForParse[i].Range.Text));
+                    Console.Write("Parse element #{0}...\t", RemoveUnvisibleCharacters(tableForParse[i].Range.Text));
                     EstimateString parsingEsS = ParsingString(i);
                     if (parsingEsS != null)
                     {
@@ -46,50 +116,58 @@ namespace FunWithWord
                         Console.WriteLine("Parsing complete");
                     }
                     else { Console.WriteLine("Parse ERROR!"); }
+                    i += Convert.ToInt32(stringShiftLength);
+                    continue;
                 }
-                if (IsInScheme(tableForParse[i].Range.Text, ISRESUMEPATTERN))
+                else if (IsInScheme(tableForParse[i].Range.Text, configDictionary[ISRESUMEPATTERN]))
                 {
-                    Console.WriteLine("I find resume");
+                    Console.Write("Parse resume...\t");
                     EstimateString resumeString = ParsingResume(i);
                     if (resumeString != null)
                     {
                         es.AddResumeString(resumeString);
-                        Console.WriteLine("Add resume");
+                        Console.WriteLine("Parsing complete");
                     }
-                    isResumeFinding = true;
+                    else { Console.WriteLine("Parse ERROR!"); }
+                    isResumeFind = true;
+                    i += Convert.ToInt32(resumeShiftLength);
+                    continue;
                 }
-                if (IsInScheme(tableForParse[i].Range.Text, ISTOTALPATTERN)) {Console.WriteLine("I find total"); es.TotalEstimateCost = ParsingCost(i);}
-                if ((isResumeFinding)&&(IsInScheme(tableForParse[i].Range.Text, ISOVERHEADSPATTERN))) { Console.WriteLine("I find overhread"); es.Overheads = ParsingCost(i); }
-                if ((isResumeFinding)&&(IsInScheme(tableForParse[i].Range.Text, ISESTIMATEPROFITPATTERN))) { Console.WriteLine("I find profit"); es.EstimateProfit = ParsingCost(i); }
-                if (IsInScheme(tableForParse[i].Range.Text, ISEQUIPMENTPATTERN)) equip = ParsingCost(i);
-                if (IsInScheme(tableForParse[i].Range.Text, ISDEPOTPATTERN)) depot = ParsingCost(i);
-                if (IsInScheme(tableForParse[i].Range.Text, ISTRANSPORTPATTERN)) transport = ParsingCost(i);
+                else if ((isResumeFind) && (IsInScheme(tableForParse[i].Range.Text, configDictionary[ISTOTALPATTERN]))) es.TotalEstimateCost = ParsingCost(i);
+                else if ((isResumeFind)&&(IsInScheme(tableForParse[i].Range.Text, configDictionary[ISOVERHEADSPATTERN]))) es.Overheads = ParsingCost(i);
+                else if ((isResumeFind)&&(IsInScheme(tableForParse[i].Range.Text, configDictionary[ISESTIMATEPROFITPATTERN]))) es.EstimateProfit = ParsingCost(i);
+                else if (IsInScheme(tableForParse[i].Range.Text, configDictionary[ISEQUIPMENTPATTERN])) equip = ParsingCost(i);
+                else if (IsInScheme(tableForParse[i].Range.Text, configDictionary[ISDEPOTPATTERN])) depot = ParsingCost(i);
+                else if (IsInScheme(tableForParse[i].Range.Text, configDictionary[ISTRANSPORTPATTERN])) transport = ParsingCost(i);
             }
             es.AddEquipment(equip, transport, depot);
+            tableForParse.DisconnectFromDocument();
             return es;
         }
-        // Хуита нахуй передлать потом нормально
+
         EstimateString ParsingString(int firstCell)
         {
             string numberpattern = "^[0-9]{1,}";
             int number = Convert.ToInt32(ShemePart(RemoveUnvisibleCharacters(tableForParse[firstCell].Range.Text), numberpattern));
             EstimateString resultString = new EstimateString(number);
-            string namecaption = tableForParse[firstCell + 1].Range.Text;
+            string namecaption = tableForParse[firstCell + stringShiftDictionary[NAME]].Range.Text;
             int divider = namecaption.IndexOf(Convert.ToChar(13));
-            resultString.Name = namecaption.Substring(1, divider - 1);
+            resultString.Name = namecaption.Substring(0, divider - 1);
             resultString.Caption = namecaption.Substring(divider + 1, namecaption.Length - divider-1);
             try
             {
-                if (NormalizeNumber(tableForParse[firstCell + 2].Range.Text) != "")
-                    resultString.Volume = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + 2].Range.Text));
-                if (NormalizeNumber(tableForParse[firstCell + 12].Range.Text) != "")
-                    resultString.CurrentWorkers = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + 12].Range.Text));
-                if (NormalizeNumber(tableForParse[firstCell + 13].Range.Text) != "")
-                    resultString.CurrentMachine = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + 13].Range.Text));
-                if (NormalizeNumber(tableForParse[firstCell + 20].Range.Text) != "")
-                    resultString.CurrentMaterials = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + 20].Range.Text));
-                if (NormalizeNumber(tableForParse[firstCell + 21].Range.Text) != "")
-                    resultString.CurrentMachineWorkers = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + 21].Range.Text));
+                if (NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[VOLUME]].Range.Text) != "")
+                    resultString.Volume = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[VOLUME]].Range.Text));
+                if (NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[COST]].Range.Text) != "")
+                    resultString.CurrentCost = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[COST]].Range.Text));
+                if (NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[PAY]].Range.Text) != "")
+                    resultString.CurrentWorkers = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[PAY]].Range.Text));
+                if (NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[MACHINE]].Range.Text) != "")
+                    resultString.CurrentMachine = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[MACHINE]].Range.Text));
+                if (NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[MATERIAL]].Range.Text) != "")
+                    resultString.CurrentMaterials = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[MATERIAL]].Range.Text));
+                if (NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[MACHINEPAY]].Range.Text) != "")
+                    resultString.CurrentMachineWorkers = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[MACHINEPAY]].Range.Text));
             }
             catch { return null; }
             return resultString;
@@ -102,16 +180,26 @@ namespace FunWithWord
             resultString.Volume = 0;
             try
             {
-                if (NormalizeNumber(tableForParse[firstCell + 7].Range.Text) != "")
-                    resultString.CurrentWorkers = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + 12].Range.Text));
-                if (NormalizeNumber(tableForParse[firstCell + 8].Range.Text) != "")
-                    resultString.CurrentMachine = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + 13].Range.Text));
-                if (NormalizeNumber(tableForParse[firstCell + 14].Range.Text) != "")
-                    resultString.CurrentMaterials = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + 20].Range.Text));
-                if (NormalizeNumber(tableForParse[firstCell + 15].Range.Text) != "")
-                    resultString.CurrentMachineWorkers = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + 21].Range.Text));
+                if (NormalizeNumber(tableForParse[firstCell + resumeShiftDictionary[COST]].Range.Text) != "")
+                    resultString.CurrentCost = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + resumeShiftDictionary[COST]].Range.Text));
+                if (NormalizeNumber(tableForParse[firstCell + resumeShiftDictionary[PAY]].Range.Text) != "")
+                    resultString.CurrentWorkers = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + resumeShiftDictionary[PAY]].Range.Text));
+                if (NormalizeNumber(tableForParse[firstCell + resumeShiftDictionary[MACHINE]].Range.Text) != "")
+                    resultString.CurrentMachine = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + resumeShiftDictionary[MACHINE]].Range.Text));
+                if (NormalizeNumber(tableForParse[firstCell + resumeShiftDictionary[MATERIAL]].Range.Text) != "")
+                    resultString.CurrentMaterials = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + resumeShiftDictionary[MATERIAL]].Range.Text));
+                if (NormalizeNumber(tableForParse[firstCell + resumeShiftDictionary[MACHINEPAY]].Range.Text) != "")
+                    resultString.CurrentMachineWorkers = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + resumeShiftDictionary[MACHINEPAY]].Range.Text));
             }
             catch { return null; }
+#if (DEBUG)
+                #region resume parsing
+                if  (resultString.CurrentCost != resultString.CurrentWorkers + resultString.CurrentMachine + resultString.CurrentMaterials)
+                    Console.WriteLine("Cost not equals sum of elements");
+                else
+                Console.WriteLine("Resume string parse good");
+                #endregion
+#endif
             return resultString;
         }
 
@@ -120,8 +208,8 @@ namespace FunWithWord
             double resultcost = 0;
             try
             {
-                if (NormalizeNumber(tableForParse[firstCell + 6].Range.Text) != "")
-                    resultcost = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + 12].Range.Text));
+                if (NormalizeNumber(tableForParse[firstCell + costShiftDictionary[COST]].Range.Text) != "")
+                    resultcost = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + costShiftDictionary[COST]].Range.Text));
             }
             catch { return 0; }
             return resultcost;

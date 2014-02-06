@@ -11,6 +11,7 @@ namespace FunWithWord
         double machineWorkersPay;
         double machineCost;
         double materialCost;
+        double cost;
 
         public double WorkerPay
         {
@@ -36,9 +37,14 @@ namespace FunWithWord
         {
             get { return workersPay + machineWorkersPay; }
         }
-        public double Cost
+        public double CalcCost
         {
             get { return workersPay + machineCost + materialCost; }
+        }
+        public double Cost
+        {
+            get { return cost; }
+            set { cost = value; }
         }
     }
 
@@ -117,6 +123,7 @@ namespace FunWithWord
         public double CurrentCost
         {
             get { return currentCost.Cost; }
+            set { currentCost.Cost = value; }
         }
 
         public override string ToString()
@@ -129,7 +136,7 @@ namespace FunWithWord
         public string[] ToStringArray()
         {
             return new string[]{
-                number.ToString(), name, caption, currentCost.WorkerPay.ToString(), currentCost.MachineCost.ToString(), 
+                number.ToString(), name, caption, volume.ToString(), currentCost.WorkerPay.ToString(), currentCost.MachineCost.ToString(), 
                 currentCost.MachineWorkersPay.ToString(), currentCost.MaterialCost.ToString(), currentCost.Cost.ToString()
             };
         }

@@ -31,6 +31,7 @@ namespace FunWithWord
             wsResumesRowCount = 1;
             wsResumes = (Worksheet)currentWorkbook.Worksheets.Add();
             wsResumes.Name = "EstimateResumes";
+            TitlesFill();
         }
 
         public void Close(string path)
@@ -47,17 +48,55 @@ namespace FunWithWord
             ResumesFill();
         }
 
+        void TitlesFill()
+        {
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 1].Value = "Estimate Name";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 2].Value = "Number";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 3].Value = "Name";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 4].Value = "Caption";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 5].Value = "Volume";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 6].Value = "Pay";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 7].Value = "Machine";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 8].Value = "PayMachine";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 9].Value = "Materials";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 10].Value = "Cost";
+            wsEstimateStrings.Rows[wsEstimateStringsRowCount].Font.Bold = true;
+            wsEstimateStringsRowCount++;
+            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 1].Value = "Estimate Name";
+            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 2].Value = "Number";
+            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 3].Value = "Name";
+            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 4].Value = "Caption";
+            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 5].Value = "Volume";
+            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 9].Value = "Materials";
+            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 10].Value = "Cost";
+            wsMaterialStrings.Cells[wsMaterialStringsRowCount].Font.Bold = true;
+            wsMaterialStringsRowCount++;
+            wsResumes.Cells[wsResumesRowCount, 1].Value = "Estimate Name";
+            wsResumes.Cells[wsResumesRowCount, 2].Value = "Pay";
+            wsResumes.Cells[wsResumesRowCount, 3].Value = "Machine";
+            wsResumes.Cells[wsResumesRowCount, 4].Value = "PayMachine";
+            wsResumes.Cells[wsResumesRowCount, 5].Value = "Materials";
+            wsResumes.Cells[wsResumesRowCount, 6].Value = "Cost";
+            wsResumes.Cells[wsResumesRowCount, 7].Value = "Equipment";
+            wsResumes.Cells[wsResumesRowCount, 8].Value = "Depot";
+            wsResumes.Cells[wsResumesRowCount, 9].Value = "Transport";
+            wsResumes.Cells[wsResumesRowCount, 10].Value = "Overhead";
+            wsResumes.Cells[wsResumesRowCount, 11].Value = "Profit";
+            wsResumes.Cells[wsResumesRowCount, 12].Value = "Total";
+            wsResumes.Cells[wsResumesRowCount].Font.Bold = true;
+            wsResumesRowCount++;
+        }
+
         void MainDataFill()
         {
             for (int i = 0; i < inputEstimate.StringCount; i++)
             {
                 string[] data = inputEstimate[i].ToStringArray();
-                Range c = (Range)wsEstimateStrings.Cells[wsEstimateStringsRowCount, 1];
-                c.Value = inputEstimate.Name;
+                wsEstimateStrings.Cells[wsEstimateStringsRowCount, 1].Value = inputEstimate.Name;
                 for (int j = 0; j < data.Length; j++)
                 {
-                    Range ran = (Range)wsEstimateStrings.Cells[wsEstimateStringsRowCount, j + 2];
-                    ran.Value = data[j];
+                    wsEstimateStrings.Cells[wsEstimateStringsRowCount, j + 2].NumberFormat = "@";
+                    wsEstimateStrings.Cells[wsEstimateStringsRowCount, j + 2].Value = data[j];
                 }
                 wsEstimateStringsRowCount++;
             }
@@ -68,12 +107,11 @@ namespace FunWithWord
             foreach (EstimateString ess in inputEstimate.EstimateMaterials())
             {
                 string[] data = ess.ToStringArray();
-                Range c = (Range)wsMaterialStrings.Cells[wsMaterialStringsRowCount, 1];
-                c.Value = ess.Name;
+                wsMaterialStrings.Cells[wsMaterialStringsRowCount, 1].Value = inputEstimate.Name;
                 for (int j = 0; j < data.Length; j++)
                 {
-                    Range ran = (Range)wsMaterialStrings.Cells[wsMaterialStringsRowCount, j + 2];
-                    ran.Value = data[j];
+                    wsMaterialStrings.Cells[wsMaterialStringsRowCount, j + 2].NumberFormat = "@";
+                    wsMaterialStrings.Cells[wsMaterialStringsRowCount, j + 2].Value = data[j];
                 }
                 wsMaterialStringsRowCount++;
             }
@@ -81,26 +119,22 @@ namespace FunWithWord
 
         void ResumesFill()
         {
-            Range c1 = (Range)wsResumes.Cells[wsResumesRowCount, 1];
-                c1.Value = inputEstimate.ResumeString.CurrentWorkers;
-            Range c2 = (Range)wsResumes.Cells[wsResumesRowCount, 2];
-                c2.Value = inputEstimate.ResumeString.CurrentMachine;
-            Range c3 = (Range)wsResumes.Cells[wsResumesRowCount, 3];
-                c3.Value = inputEstimate.ResumeString.CurrentMaterials;
-            Range c4 = (Range)wsResumes.Cells[wsResumesRowCount, 4];
-                c4.Value = inputEstimate.ResumeString.CurrentCost;
-            Range c5 = (Range)wsResumes.Cells[wsResumesRowCount, 5];
-                c5.Value = inputEstimate.Equipment.EquipmentCost;
-            Range c6 = (Range)wsResumes.Cells[wsResumesRowCount, 6];
-                c6.Value = inputEstimate.Equipment.DepotCost;
-            Range c7 = (Range)wsResumes.Cells[wsResumesRowCount, 7];
-                c7.Value = inputEstimate.Equipment.TransportCost;
-            Range c8 = (Range)wsResumes.Cells[wsResumesRowCount, 8];
-                c8.Value = inputEstimate.Overheads;
-            Range c9 = (Range)wsResumes.Cells[wsResumesRowCount, 9];
-                c9.Value = inputEstimate.EstimateProfit;
-            Range c10 = (Range)wsResumes.Cells[wsResumesRowCount, 10];
-                c10.Value = inputEstimate.TotalEstimateCost;
+            for (int i = 1; i < 13; i++)
+            {
+                wsResumes.Cells[wsResumesRowCount, i].NumberFormat = "@";
+            }
+            wsResumes.Cells[wsResumesRowCount, 1].Value = inputEstimate.Name;
+            wsResumes.Cells[wsResumesRowCount, 2].Value = inputEstimate.ResumeString.CurrentWorkers;
+            wsResumes.Cells[wsResumesRowCount, 3].Value = inputEstimate.ResumeString.CurrentMachine;
+            wsResumes.Cells[wsResumesRowCount, 4].Value = inputEstimate.ResumeString.CurrentMachineWorkers;
+            wsResumes.Cells[wsResumesRowCount, 5].Value = inputEstimate.ResumeString.CurrentMaterials;
+            wsResumes.Cells[wsResumesRowCount, 6].Value = inputEstimate.ResumeString.CurrentCost;
+            wsResumes.Cells[wsResumesRowCount, 7].Value = inputEstimate.Equipment.EquipmentCost;
+            wsResumes.Cells[wsResumesRowCount, 8].Value = inputEstimate.Equipment.DepotCost;
+            wsResumes.Cells[wsResumesRowCount, 9].Value = inputEstimate.Equipment.TransportCost;
+            wsResumes.Cells[wsResumesRowCount, 10].Value = inputEstimate.Overheads;
+            wsResumes.Cells[wsResumesRowCount, 11].Value = inputEstimate.EstimateProfit;
+            wsResumes.Cells[wsResumesRowCount, 12].Value = inputEstimate.TotalEstimateCost;
             wsResumesRowCount++;
         }
     }

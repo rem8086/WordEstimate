@@ -43,6 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConfigParse.cs" />
+    <Compile Include="ElementTemplate.cs" />
     <Compile Include="Estimate.cs" />
     <Compile Include="EstimateString.cs" />
     <Compile Include="ExcelOutput.cs" />

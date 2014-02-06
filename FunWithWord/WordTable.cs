@@ -22,7 +22,6 @@ namespace FunWithWord
         {
             wordApplicationProcessId = 0;
             Document wordDocument = new Document();
-            //wordTable = new Table();
         }
 
         public void ConnectToDocment(string pathToDoc)
@@ -37,7 +36,8 @@ namespace FunWithWord
             foreach (Process p in Process.GetProcessesByName("WINWORD"))
             {
                 if (!processIDList.Contains(p.Id)) wordApplicationProcessId = p.Id;
-            }           
+            }
+            
         }
 
         public Cell this[int index]
@@ -48,6 +48,13 @@ namespace FunWithWord
         public void ChooseTable(int tableNumber)
         {
             wordTable = wordDocument.Tables[tableNumber];
+            wordDocument.Tables[tableNumber].Select();
+            Selection s = wordDocument.ActiveWindow.Panes[1].Selection;
+            foreach (Cell c in s.Cells)
+            {
+                Console.WriteLine(c.Range.Text);
+            }
+            Console.ReadLine();
         }
 
         public Cell GetElement(int index)

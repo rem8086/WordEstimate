@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define DEBUG
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,13 +12,10 @@ namespace FunWithWord
     class Program
     {
         const int BORDEROFUNVISIBLECHARS = 32;
-        const int TABLENUMBER = 3;
+        const string CONFIGFILEPATH = "config.ini";
 
         static void Main(string[] args)
         {
-
-            if (Regex.IsMatch("итого  по  смете", "итого[\\s]{1,}по[\\s]{1,}смете")) Console.WriteLine("YES");
-            Console.ReadLine();
             string inputdirectory = "";
             if (args.Length == 0)
             {
@@ -29,20 +27,32 @@ namespace FunWithWord
             string outputdirectory = (args.Length < 2) ? inputdirectory : args[1];
             Console.WriteLine("Output directory: {0}", outputdirectory);
             DirectoryInfo di = new DirectoryInfo(inputdirectory);
-            List<FileInfo> fil = di.GetFiles("*.doc").ToList<FileInfo>();
-            fil.Concat(di.GetFiles("*.rtf").ToList<FileInfo>());
-            List<Estimate> estimateList = new List<Estimate>();
+            List<FileInfo> fil = di.GetFiles("*.rtf").ToList<FileInfo>();
+            fil =  fil.Concat(di.GetFiles("*.doc").ToList<FileInfo>()).ToList<FileInfo>();
+#if (DEBUG)
+            #region Estimate files List
+            Console.WriteLine("#### List of Estimate files ####");
+            foreach (FileInfo fi in fil)
+            {
+                Console.WriteLine("Estimate: {0}", fi.Name);
+            }
+            Console.WriteLine("#### End of Estimate list ####");
+            #endregion
+#endif
+            //List<Estimate> estimateList = new List<Estimate>();
+            WordTableParser wtp = new WordTableParser();
             ExcelOutput exo = new ExcelOutput();
             foreach (FileInfo fi in fil)
             {
-                Console.WriteLine("Parsing "+inputdirectory+"\\"+fi.Name);
-                WordTableParser wtp = new WordTableParser();
-                Estimate currentEstimate = wtp.Parsing(inputdirectory + "\\" + fi.Name, TABLENUMBER);
-                estimateList.Add(currentEstimate);
-                Console.WriteLine("Parsing complite");
+                Console.WriteLine();
+                Console.WriteLine("Parsing " + fi.Name);
+                Estimate currentEstimate = wtp.Parsing(inputdirectory + "\\" + fi.Name);
+                //estimateList.Add(currentEstimate);
+                Console.WriteLine("Parsing " + fi.Name + " complite");
                 exo.FillWith(currentEstimate);
             }
             exo.Close(outputdirectory);
+            Console.WriteLine("DONE!");
             Console.ReadLine();
         }
 
