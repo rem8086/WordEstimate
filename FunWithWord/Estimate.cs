@@ -5,7 +5,7 @@ using System.Text;
 
 namespace FunWithWord
 {
-    public struct EstimateEquipment
+    public struct EstimateEquipment         //class for whole estimate (list of EstimateString and additional data)
     {
         double equipmentCost;
         double transportCost;

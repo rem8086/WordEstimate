@@ -4,3 +4,9 @@ C:\Users\Sergey\documents\visual studio 2010\Projects\FunWithWord\FunWithWord\ob
 C:\Users\Sergey\documents\visual studio 2010\Projects\FunWithWord\FunWithWord\obj\x86\Release\FunWithWord.csproj.ResolveComReference.cache
 C:\Users\Sergey\documents\visual studio 2010\Projects\FunWithWord\FunWithWord\obj\x86\Release\FunWithWord.exe
 C:\Users\Sergey\documents\visual studio 2010\Projects\FunWithWord\FunWithWord\obj\x86\Release\FunWithWord.pdb
+\\srvdfs\Userdir\manager\suvorov\ProjTest\WordParser\FunWithWord\obj\x86\Release\FunWithWord.csproj.ResolveComReference.cache
+\\srvdfs\Userdir\manager\suvorov\ProjTest\WordParser\FunWithWord\obj\x86\Release\FunWithWord.exe
+\\srvdfs\Userdir\manager\suvorov\ProjTest\WordParser\FunWithWord\obj\x86\Release\FunWithWord.pdb
+\\srvdfs\Userdir\manager\suvorov\ProjTest\WordParser\FunWithWord\bin\Release\FunWithWord.exe
+\\srvdfs\Userdir\manager\suvorov\ProjTest\WordParser\FunWithWord\bin\Release\FunWithWord.pdb
+\\srvdfs\Userdir\manager\suvorov\ProjTest\WordParser\FunWithWord\obj\x86\Release\ResolveAssemblyReference.cache

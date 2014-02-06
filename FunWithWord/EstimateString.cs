@@ -5,7 +5,7 @@ using System.Text;
 
 namespace FunWithWord
 {
-    struct StringCostElements
+    struct StringCostElements       //struct and class, which present string of estimate, just data
     {
         double workersPay;
         double machineWorkersPay;

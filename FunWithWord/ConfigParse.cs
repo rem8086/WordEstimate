@@ -6,7 +6,7 @@ using System.IO;
 
 namespace FunWithWord
 {
-    class ConfigParse
+    class ConfigParse // Parsing of config file (config.ini) and pulling outher constants
     {
         StreamReader configFile;
         Dictionary<string, string> configDictionary;
@@ -25,7 +25,7 @@ namespace FunWithWord
             }
         }
 
-        void DefaultDictionaryCreate()
+        void DefaultDictionaryCreate() // filling parametr dictionary with default values
         {
             configDictionary.Add("TableNumber", "3");
             configDictionary.Add("ElementsScheme", "PartsOfEstimate_Scheme.xls");
@@ -33,8 +33,6 @@ namespace FunWithWord
             configDictionary.Add("ResumeStringScheme", "Resume");
             configDictionary.Add("CommonStringCostScheme", "Cost");
             configDictionary.Add("StringNumberPattern", "^[0-9]{1,}\\.$");
-            //configDictionary.Add("NumberColumn", "1");
-            //configDictionary.Add("StringLength", "21");
             configDictionary.Add("ResumeStringPattern", "ИТОГО[\\s]{1,}ПО[\\s]{1,}СМЕТЕ");
             configDictionary.Add("EquipmentStringPattern", "СТОИМОСТЬ[\\s]{1,}ОБОРУДОВАНИЯ");
             configDictionary.Add("TransportCostPattern", "ТРАНСПОРТНЫЕ[\\s]{1,}РАСХОДЫ");
@@ -42,11 +40,10 @@ namespace FunWithWord
             configDictionary.Add("TotalStringPattern", "ВСЕГО[\\s]{1,}ПО[\\s]{1,}СМЕТЕ");
             configDictionary.Add("OverheadStringPattern", "ВСЕГО НАКЛАДНЫЕ РАСХОДЫ");
             configDictionary.Add("EstimateProfitStringPattern", "ВСЕГО СМЕТНАЯ ПРИБЫЛЬ");
-            //configDictionary.Add("NameColumn", "2");
         }
 
-        public Dictionary<string, string> Parsing()
-        {
+        public Dictionary<string, string> Parsing() //procedure of config file parsing
+        {                                           // # - sight for comments, space - separator symbol
             while (!configFile.EndOfStream)
             {
                 string currentstring = configFile.ReadLine();

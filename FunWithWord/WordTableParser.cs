@@ -4,13 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.Office.Interop.Word;
+using System.Threading;
 
 
 namespace FunWithWord
 {
     class WordTableParser
     {
-        const string CONFIGPATH = "config.ini";
+        const string CONFIGPATH = "config.ini";         // program constants - name of config file, and names of config file elements
         const string TABLENUMBER = "TableNumber";
         const string ISNUMBERPATTERN = "StringNumberPattern";
         const string ISRESUMEPATTERN = "ResumeStringPattern";
@@ -37,15 +39,16 @@ namespace FunWithWord
 
         
         WordTable tableForParse;
-        Dictionary<string, string> configDictionary;
-        Dictionary<string, int> stringShiftDictionary;
+        Dictionary<string, string> configDictionary;    // dictionary with config elements with values from config file
+                                                            //three dictionaries with relative positions of needed elements (like volume, cost, machine cost, material cost)
+        Dictionary<string, int> stringShiftDictionary;      //for every estimate string (each elementary work in estimate)
         int stringShiftFirst, stringShiftLength;
-        Dictionary<string, int> resumeShiftDictionary;
+        Dictionary<string, int> resumeShiftDictionary;      //for total estimate resume 
         int resumeShiftFirst, resumeShiftLength;
-        Dictionary<string, int> costShiftDictionary;
+        Dictionary<string, int> costShiftDictionary;        //for the other elements like equipment, estimate profit etc. (only cost pulling)
         int costShiftFirst, costShiftLength;
 
-        public WordTableParser()
+        public WordTableParser()            //fillind dictionaries with values from config file, end Excel templates file
         {
             tableForParse = new WordTable();
             ConfigParse config = new ConfigParse(CONFIGPATH);
@@ -94,35 +97,36 @@ namespace FunWithWord
 #endif
         }
 
-        public Estimate Parsing(string filepath)
+        public Estimate Parsing(string filepath)    //main function - pull estimate data from Word file
         {
             tableForParse.ConnectToDocment(filepath);
             tableForParse.ChooseTable(Convert.ToInt32(configDictionary[TABLENUMBER]));
             Estimate es = new Estimate(filepath.Substring(filepath.LastIndexOf("\\")+1));
             double equip = 0, depot = 0, transport = 0;
             bool isResumeFind = false;
-            for (int i = 1; i < tableForParse.GetElementCount; i++)
+            foreach (Cell currentCell in tableForParse.SelectedTable.Cells)         //check every cell in table and by regexp pattern try to find interesting element
             {
-                if ((tableForParse[i].ColumnIndex != Convert.ToInt32(stringShiftFirst)) && (tableForParse[i].ColumnIndex != Convert.ToInt32(resumeShiftFirst)) &&
-                    (tableForParse[i].ColumnIndex != Convert.ToInt32(costShiftFirst))) continue;
-                if ((tableForParse[i].ColumnIndex == Convert.ToInt32(stringShiftFirst)) &&
-                    (IsInScheme(RemoveUnvisibleCharacters(tableForParse[i].Range.Text), configDictionary[ISNUMBERPATTERN])) && !(isResumeFind))
+                if ((currentCell.ColumnIndex != Convert.ToInt32(stringShiftFirst)) && (currentCell.ColumnIndex != Convert.ToInt32(resumeShiftFirst)) &&
+                    (currentCell.ColumnIndex != Convert.ToInt32(costShiftFirst))) continue;
+                string currentCellText = RemoveUnvisibleCharacters(currentCell.Range.Text);
+                if ((currentCell.ColumnIndex == Convert.ToInt32(stringShiftFirst)) &&
+                    (Regex.IsMatch(currentCellText, configDictionary[ISNUMBERPATTERN])) && !(isResumeFind)) //like number of estimate string
                 {
-                    Console.Write("Parse element #{0}...\t", RemoveUnvisibleCharacters(tableForParse[i].Range.Text));
-                    EstimateString parsingEsS = ParsingString(i);
+                    Console.Write("Parse element #{0}...\t", currentCellText);
+                    EstimateString parsingEsS = ParsingString(currentCell);                                 //then parse this and next cells and add result into Estimate
                     if (parsingEsS != null)
                     {
                         es.Add(parsingEsS);
                         Console.WriteLine("Parsing complete");
                     }
                     else { Console.WriteLine("Parse ERROR!"); }
-                    i += Convert.ToInt32(stringShiftLength);
+                    //i += Convert.ToInt32(stringShiftLength);
                     continue;
                 }
-                else if (IsInScheme(tableForParse[i].Range.Text, configDictionary[ISRESUMEPATTERN]))
+                else if (Regex.IsMatch(currentCellText, configDictionary[ISRESUMEPATTERN]))                 //like total result string
                 {
                     Console.Write("Parse resume...\t");
-                    EstimateString resumeString = ParsingResume(i);
+                    EstimateString resumeString = ParsingResume(currentCell);                               //parse this too
                     if (resumeString != null)
                     {
                         es.AddResumeString(resumeString);
@@ -130,66 +134,67 @@ namespace FunWithWord
                     }
                     else { Console.WriteLine("Parse ERROR!"); }
                     isResumeFind = true;
-                    i += Convert.ToInt32(resumeShiftLength);
+                    //i += Convert.ToInt32(resumeShiftLength);
                     continue;
-                }
-                else if ((isResumeFind) && (IsInScheme(tableForParse[i].Range.Text, configDictionary[ISTOTALPATTERN]))) es.TotalEstimateCost = ParsingCost(i);
-                else if ((isResumeFind)&&(IsInScheme(tableForParse[i].Range.Text, configDictionary[ISOVERHEADSPATTERN]))) es.Overheads = ParsingCost(i);
-                else if ((isResumeFind)&&(IsInScheme(tableForParse[i].Range.Text, configDictionary[ISESTIMATEPROFITPATTERN]))) es.EstimateProfit = ParsingCost(i);
-                else if (IsInScheme(tableForParse[i].Range.Text, configDictionary[ISEQUIPMENTPATTERN])) equip = ParsingCost(i);
-                else if (IsInScheme(tableForParse[i].Range.Text, configDictionary[ISDEPOTPATTERN])) depot = ParsingCost(i);
-                else if (IsInScheme(tableForParse[i].Range.Text, configDictionary[ISTRANSPORTPATTERN])) transport = ParsingCost(i);
+                }                                                                                           //like the other strings, necessary to us
+                else if ((isResumeFind) && (Regex.IsMatch(currentCellText, configDictionary[ISTOTALPATTERN]))) es.TotalEstimateCost = ParsingCost(currentCell);
+                else if ((isResumeFind) && (Regex.IsMatch(currentCellText, configDictionary[ISOVERHEADSPATTERN]))) es.Overheads = ParsingCost(currentCell);
+                else if ((isResumeFind) && (Regex.IsMatch(currentCellText, configDictionary[ISESTIMATEPROFITPATTERN]))) es.EstimateProfit = ParsingCost(currentCell);
+                else if (Regex.IsMatch(currentCellText, configDictionary[ISEQUIPMENTPATTERN])) equip = ParsingCost(currentCell);
+                else if (Regex.IsMatch(currentCellText, configDictionary[ISDEPOTPATTERN])) depot = ParsingCost(currentCell);
+                else if (Regex.IsMatch(currentCellText, configDictionary[ISTRANSPORTPATTERN])) transport = ParsingCost(currentCell);
+                 
             }
             es.AddEquipment(equip, transport, depot);
             tableForParse.DisconnectFromDocument();
             return es;
         }
 
-        EstimateString ParsingString(int firstCell)
+        EstimateString ParsingString(Cell firstCell)    //function for parsing part of table and return string of estimate
         {
             string numberpattern = "^[0-9]{1,}";
-            int number = Convert.ToInt32(ShemePart(RemoveUnvisibleCharacters(tableForParse[firstCell].Range.Text), numberpattern));
+            int number = Convert.ToInt32(Regex.Match(RemoveUnvisibleCharacters(firstCell.Range.Text), numberpattern).Value);
             EstimateString resultString = new EstimateString(number);
-            string namecaption = tableForParse[firstCell + stringShiftDictionary[NAME]].Range.Text;
+            string namecaption = CellShift(firstCell, stringShiftDictionary[NAME]).Range.Text;  //found name and caption by positions of cells versus cell with number
             int divider = namecaption.IndexOf(Convert.ToChar(13));
             resultString.Name = namecaption.Substring(0, divider - 1);
             resultString.Caption = namecaption.Substring(divider + 1, namecaption.Length - divider-1);
             try
-            {
-                if (NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[VOLUME]].Range.Text) != "")
-                    resultString.Volume = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[VOLUME]].Range.Text));
-                if (NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[COST]].Range.Text) != "")
-                    resultString.CurrentCost = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[COST]].Range.Text));
-                if (NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[PAY]].Range.Text) != "")
-                    resultString.CurrentWorkers = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[PAY]].Range.Text));
-                if (NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[MACHINE]].Range.Text) != "")
-                    resultString.CurrentMachine = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[MACHINE]].Range.Text));
-                if (NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[MATERIAL]].Range.Text) != "")
-                    resultString.CurrentMaterials = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[MATERIAL]].Range.Text));
-                if (NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[MACHINEPAY]].Range.Text) != "")
-                    resultString.CurrentMachineWorkers = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + stringShiftDictionary[MACHINEPAY]].Range.Text));
+            {                                                                                   //as well found another data
+                if (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[VOLUME]).Range.Text) != "")
+                    resultString.Volume = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, stringShiftDictionary[VOLUME]).Range.Text));
+                if (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[COST]).Range.Text) != "")
+                    resultString.CurrentCost = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, stringShiftDictionary[COST]).Range.Text));
+                if (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[PAY]).Range.Text) != "")
+                    resultString.CurrentWorkers = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, stringShiftDictionary[PAY]).Range.Text));
+                if (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MACHINE]).Range.Text) != "")
+                    resultString.CurrentMachine = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MACHINE]).Range.Text));
+                if (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MATERIAL]).Range.Text) != "")
+                    resultString.CurrentMaterials = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MATERIAL]).Range.Text));
+                if (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MACHINEPAY]).Range.Text) != "")
+                    resultString.CurrentMachineWorkers = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MACHINEPAY]).Range.Text));
             }
             catch { return null; }
             return resultString;
         }
 
-        EstimateString ParsingResume(int firstCell)
+        EstimateString ParsingResume(Cell firstCell)    //like ParsingsString function return resume estimate string 
         {
             EstimateString resultString = new EstimateString(0);
-            resultString.Name = tableForParse[firstCell].Range.Text;
+            resultString.Name = firstCell.Range.Text;
             resultString.Volume = 0;
             try
             {
-                if (NormalizeNumber(tableForParse[firstCell + resumeShiftDictionary[COST]].Range.Text) != "")
-                    resultString.CurrentCost = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + resumeShiftDictionary[COST]].Range.Text));
-                if (NormalizeNumber(tableForParse[firstCell + resumeShiftDictionary[PAY]].Range.Text) != "")
-                    resultString.CurrentWorkers = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + resumeShiftDictionary[PAY]].Range.Text));
-                if (NormalizeNumber(tableForParse[firstCell + resumeShiftDictionary[MACHINE]].Range.Text) != "")
-                    resultString.CurrentMachine = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + resumeShiftDictionary[MACHINE]].Range.Text));
-                if (NormalizeNumber(tableForParse[firstCell + resumeShiftDictionary[MATERIAL]].Range.Text) != "")
-                    resultString.CurrentMaterials = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + resumeShiftDictionary[MATERIAL]].Range.Text));
-                if (NormalizeNumber(tableForParse[firstCell + resumeShiftDictionary[MACHINEPAY]].Range.Text) != "")
-                    resultString.CurrentMachineWorkers = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + resumeShiftDictionary[MACHINEPAY]].Range.Text));
+                if (NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[COST]).Range.Text) != "")
+                    resultString.CurrentCost = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[COST]).Range.Text));
+                if (NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[PAY]).Range.Text) != "")
+                    resultString.CurrentWorkers = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[PAY]).Range.Text));
+                if (NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MACHINE]).Range.Text) != "")
+                    resultString.CurrentMachine = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MACHINE]).Range.Text));
+                if (NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MATERIAL]).Range.Text) != "")
+                    resultString.CurrentMaterials = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MATERIAL]).Range.Text));
+                if (NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MACHINEPAY]).Range.Text) != "")
+                    resultString.CurrentMachineWorkers = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MACHINEPAY]).Range.Text));
             }
             catch { return null; }
 #if (DEBUG)
@@ -203,16 +208,29 @@ namespace FunWithWord
             return resultString;
         }
 
-        double ParsingCost(int firstCell)
+        double ParsingCost(Cell firstCell)      //and another parsing function for the other elemtns (only cost getting)
         {
             double resultcost = 0;
             try
             {
-                if (NormalizeNumber(tableForParse[firstCell + costShiftDictionary[COST]].Range.Text) != "")
-                    resultcost = Convert.ToDouble(NormalizeNumber(tableForParse[firstCell + costShiftDictionary[COST]].Range.Text));
+                if (NormalizeNumber(CellShift(firstCell, costShiftDictionary[COST]).Range.Text) != "")
+                    resultcost = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, costShiftDictionary[COST]).Range.Text));
             }
             catch { return 0; }
             return resultcost;
+        }
+
+        Cell CellShift(Cell inputCell, int shift) //return cell of table, shifted versus inputCell on needed count of cells
+        {
+            if (shift < 1) return null;
+            Cell shiftCell = inputCell;
+            int i = 0;
+            do
+            {
+                shiftCell = shiftCell.Next;
+                i++;
+            } while (i < shift);
+            return shiftCell;
         }
 
         string NormalizeNumber(string inputstring)
@@ -234,14 +252,5 @@ namespace FunWithWord
             return str;
         }
 
-        bool IsInScheme(string inputString, string pattern)
-        {
-            return Regex.IsMatch(inputString, pattern);
-        }
-
-        string ShemePart(string inputstring, string pattern)
-        {
-            return Regex.Match(inputstring, pattern).Value;
-        }
     }
 }

@@ -6,7 +6,7 @@ using Microsoft.Office.Interop.Excel;
 
 namespace FunWithWord
 {
-    class ExcelOutput
+    class ExcelOutput       //class for work with output excel file
     {
         Estimate inputEstimate;
         Workbook currentWorkbook;
@@ -40,7 +40,7 @@ namespace FunWithWord
             currentWorkbook.Close(SaveChanges: true);
         }
 
-        public void FillWith(Estimate es)
+        public void FillWith(Estimate es) //main procedure of estimate data filling 
         {
             inputEstimate = es;
             MainDataFill();
@@ -48,7 +48,7 @@ namespace FunWithWord
             ResumesFill();
         }
 
-        void TitlesFill()
+        void TitlesFill()       //titles and formating
         {
             wsEstimateStrings.Cells[wsEstimateStringsRowCount, 1].Value = "Estimate Name";
             wsEstimateStrings.Cells[wsEstimateStringsRowCount, 2].Value = "Number";
@@ -87,7 +87,7 @@ namespace FunWithWord
             wsResumesRowCount++;
         }
 
-        void MainDataFill()
+        void MainDataFill()         //page with all strings
         {
             for (int i = 0; i < inputEstimate.StringCount; i++)
             {
@@ -115,7 +115,7 @@ namespace FunWithWord
                 }
                 wsMaterialStringsRowCount++;
             }
-        }
+        }   //page with only material strings
 
         void ResumesFill()
         {
@@ -136,6 +136,6 @@ namespace FunWithWord
             wsResumes.Cells[wsResumesRowCount, 11].Value = inputEstimate.EstimateProfit;
             wsResumes.Cells[wsResumesRowCount, 12].Value = inputEstimate.TotalEstimateCost;
             wsResumesRowCount++;
-        }
+        }           //page with resumes
     }
 }

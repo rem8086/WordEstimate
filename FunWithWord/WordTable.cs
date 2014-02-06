@@ -7,11 +7,12 @@ using Microsoft.Office.Interop.Word;
 
 namespace FunWithWord
 {
-    class WordTable
+    class WordTable     //serving class for work with Word document
     {
         int wordApplicationProcessId;
         Document wordDocument;
         Table wordTable;
+        Selection selectedTable;
 
         public Table WTable
         {
@@ -49,12 +50,12 @@ namespace FunWithWord
         {
             wordTable = wordDocument.Tables[tableNumber];
             wordDocument.Tables[tableNumber].Select();
-            Selection s = wordDocument.ActiveWindow.Panes[1].Selection;
-            foreach (Cell c in s.Cells)
-            {
-                Console.WriteLine(c.Range.Text);
-            }
-            Console.ReadLine();
+            selectedTable = wordDocument.ActiveWindow.Panes[1].Selection;
+        }
+
+        public Selection SelectedTable
+        {
+            get { return selectedTable; }
         }
 
         public Cell GetElement(int index)
