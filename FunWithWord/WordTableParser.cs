@@ -26,7 +26,7 @@ namespace FunWithWord
         const string ELEMENTSSCHEME = "ElementsScheme";
         const string ESTIMATESTRINGSCHEME = "EstimateStringScheme";
         const string RESUMETRINGSCHEME = "ResumeStringScheme";
-        const string COMMONSTRINCOSTSCHEME = "CommonStringCostScheme";
+        const string COMMONSTRINGCOSTSCHEME = "CommonStringCostScheme";
 
         const string NUMBER = "Number";
         const string NAME = "Name";
@@ -61,7 +61,7 @@ namespace FunWithWord
             resumeShiftDictionary = templ.ValuesShift(configDictionary[RESUMETRINGSCHEME], NAME,
                 new string[] { COST, PAY, MACHINE, MATERIAL, MACHINEPAY }, out resumeShiftFirst, out resumeShiftLength);
             costShiftFirst = 0; costShiftLength = 0;
-            costShiftDictionary = templ.ValuesShift(configDictionary[COMMONSTRINCOSTSCHEME], NAME,
+            costShiftDictionary = templ.ValuesShift(configDictionary[COMMONSTRINGCOSTSCHEME], NAME,
                 new string[] { COST }, out costShiftFirst, out costShiftLength);
             templ.Dispose();
 #if (DEBUG)
@@ -161,17 +161,17 @@ namespace FunWithWord
             resultString.Caption = namecaption.Substring(divider + 1, namecaption.Length - divider-1);
             try
             {                                                                                   //as well found another data
-                if (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[VOLUME]).Range.Text) != "")
+                if ((stringShiftDictionary.ContainsKey(VOLUME))&&(NormalizeNumber(CellShift(firstCell, stringShiftDictionary[VOLUME]).Range.Text) != ""))
                     resultString.Volume = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, stringShiftDictionary[VOLUME]).Range.Text));
-                if (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[COST]).Range.Text) != "")
+                if ((stringShiftDictionary.ContainsKey(COST)) && (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[COST]).Range.Text) != ""))
                     resultString.CurrentCost = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, stringShiftDictionary[COST]).Range.Text));
-                if (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[PAY]).Range.Text) != "")
+                if ((stringShiftDictionary.ContainsKey(PAY)) && (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[PAY]).Range.Text) != ""))
                     resultString.CurrentWorkers = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, stringShiftDictionary[PAY]).Range.Text));
-                if (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MACHINE]).Range.Text) != "")
+                if ((stringShiftDictionary.ContainsKey(MACHINE)) && (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MACHINE]).Range.Text) != ""))
                     resultString.CurrentMachine = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MACHINE]).Range.Text));
-                if (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MATERIAL]).Range.Text) != "")
+                if ((stringShiftDictionary.ContainsKey(MATERIAL)) && (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MATERIAL]).Range.Text) != ""))
                     resultString.CurrentMaterials = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MATERIAL]).Range.Text));
-                if (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MACHINEPAY]).Range.Text) != "")
+                if ((stringShiftDictionary.ContainsKey(MACHINEPAY)) && (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MACHINEPAY]).Range.Text) != ""))
                     resultString.CurrentMachineWorkers = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MACHINEPAY]).Range.Text));
             }
             catch { return null; }
@@ -185,15 +185,15 @@ namespace FunWithWord
             resultString.Volume = 0;
             try
             {
-                if (NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[COST]).Range.Text) != "")
+                if ((resumeShiftDictionary.ContainsKey(COST))&&(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[COST]).Range.Text) != ""))
                     resultString.CurrentCost = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[COST]).Range.Text));
-                if (NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[PAY]).Range.Text) != "")
+                if ((resumeShiftDictionary.ContainsKey(PAY))&&(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[PAY]).Range.Text) != ""))
                     resultString.CurrentWorkers = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[PAY]).Range.Text));
-                if (NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MACHINE]).Range.Text) != "")
+                if ((resumeShiftDictionary.ContainsKey(MACHINE))&&(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MACHINE]).Range.Text) != ""))
                     resultString.CurrentMachine = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MACHINE]).Range.Text));
-                if (NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MATERIAL]).Range.Text) != "")
+                if ((resumeShiftDictionary.ContainsKey(MATERIAL))&&(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MATERIAL]).Range.Text) != ""))
                     resultString.CurrentMaterials = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MATERIAL]).Range.Text));
-                if (NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MACHINEPAY]).Range.Text) != "")
+                if ((resumeShiftDictionary.ContainsKey(MACHINEPAY))&&(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MACHINEPAY]).Range.Text) != ""))
                     resultString.CurrentMachineWorkers = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MACHINEPAY]).Range.Text));
             }
             catch { return null; }
@@ -213,14 +213,14 @@ namespace FunWithWord
             double resultcost = 0;
             try
             {
-                if (NormalizeNumber(CellShift(firstCell, costShiftDictionary[COST]).Range.Text) != "")
+                if ((costShiftDictionary.ContainsKey(COST))&&(NormalizeNumber(CellShift(firstCell, costShiftDictionary[COST]).Range.Text) != ""))
                     resultcost = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, costShiftDictionary[COST]).Range.Text));
             }
             catch { return 0; }
             return resultcost;
         }
 
-        Cell CellShift(Cell inputCell, int shift) //return cell of table, shifted versus inputCell on needed count of cells
+        Cell CellShift(Cell inputCell, int shift) //return cell of table, shifted versus inputCell at needed count of cells
         {
             if (shift < 1) return null;
             Cell shiftCell = inputCell;

@@ -69,7 +69,7 @@ namespace FunWithWord
             wsMaterialStrings.Cells[wsMaterialStringsRowCount, 5].Value = "Volume";
             wsMaterialStrings.Cells[wsMaterialStringsRowCount, 9].Value = "Materials";
             wsMaterialStrings.Cells[wsMaterialStringsRowCount, 10].Value = "Cost";
-            wsMaterialStrings.Cells[wsMaterialStringsRowCount].Font.Bold = true;
+            wsMaterialStrings.Rows[wsMaterialStringsRowCount].Font.Bold = true;
             wsMaterialStringsRowCount++;
             wsResumes.Cells[wsResumesRowCount, 1].Value = "Estimate Name";
             wsResumes.Cells[wsResumesRowCount, 2].Value = "Pay";
@@ -83,7 +83,7 @@ namespace FunWithWord
             wsResumes.Cells[wsResumesRowCount, 10].Value = "Overhead";
             wsResumes.Cells[wsResumesRowCount, 11].Value = "Profit";
             wsResumes.Cells[wsResumesRowCount, 12].Value = "Total";
-            wsResumes.Cells[wsResumesRowCount].Font.Bold = true;
+            wsResumes.Rows[wsResumesRowCount].Font.Bold = true;
             wsResumesRowCount++;
         }
 
@@ -102,7 +102,7 @@ namespace FunWithWord
             }
         }
 
-        void MaterialStringsFill()
+        void MaterialStringsFill()  //page with only material strings
         {
             foreach (EstimateString ess in inputEstimate.EstimateMaterials())
             {
@@ -115,9 +115,9 @@ namespace FunWithWord
                 }
                 wsMaterialStringsRowCount++;
             }
-        }   //page with only material strings
+        }
 
-        void ResumesFill()
+        void ResumesFill()          //page with resumes
         {
             for (int i = 1; i < 13; i++)
             {
@@ -136,6 +136,6 @@ namespace FunWithWord
             wsResumes.Cells[wsResumesRowCount, 11].Value = inputEstimate.EstimateProfit;
             wsResumes.Cells[wsResumesRowCount, 12].Value = inputEstimate.TotalEstimateCost;
             wsResumesRowCount++;
-        }           //page with resumes
+        }          
     }
 }
