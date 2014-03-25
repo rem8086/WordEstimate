@@ -52,7 +52,7 @@ namespace FunWithWord
         {
             tableForParse = new WordTable();
             ConfigParse config = new ConfigParse(CONFIGPATH);
-            configDictionary = config.Parsing();
+            configDictionary = config.Parsing();                
             ElementTemplate templ = new ElementTemplate(configDictionary[ELEMENTSSCHEME]);
             stringShiftFirst = 0; stringShiftLength = 0;
             stringShiftDictionary = templ.ValuesShift(configDictionary[ESTIMATESTRINGSCHEME], NUMBER, 
@@ -85,7 +85,7 @@ namespace FunWithWord
             }
             Console.WriteLine("Column of main element is {0}", resumeShiftFirst);
             Console.WriteLine("Length of block is {0}", resumeShiftLength);
-            Console.WriteLine("###### Template for {0} #####", configDictionary[COMMONSTRINCOSTSCHEME]);
+            Console.WriteLine("###### Template for {0} #####", configDictionary[COMMONSTRINGCOSTSCHEME]);
             foreach (KeyValuePair<string, int> pair in costShiftDictionary)
             {
                 Console.WriteLine("{0} shift is {1}", pair.Key, pair.Value);

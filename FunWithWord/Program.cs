@@ -13,7 +13,7 @@ namespace FunWithWord
     {
         const int BORDEROFUNVISIBLECHARS = 32;
         const string CONFIGFILEPATH = "config.ini";
-
+        
         static void Main(string[] args)
         {
             string inputdirectory = "";
@@ -54,15 +54,5 @@ namespace FunWithWord
             Console.ReadLine();
         }
 
-        static string RemoveUnvisibleCharacters(string inputstring)
-        {
-            string str = "";
-            for (int i = 0; i < inputstring.Length; i++)
-            {
-                if (Convert.ToInt32(inputstring[i]) >= BORDEROFUNVISIBLECHARS)
-                    str += inputstring[i];
-            }
-            return str;
-        }
     }
 }

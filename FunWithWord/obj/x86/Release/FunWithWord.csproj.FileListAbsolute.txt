@@ -10,3 +10,9 @@ C:\Users\Sergey\documents\visual studio 2010\Projects\FunWithWord\FunWithWord\ob
 \\srvdfs\Userdir\manager\suvorov\ProjTest\WordParser\FunWithWord\bin\Release\FunWithWord.exe
 \\srvdfs\Userdir\manager\suvorov\ProjTest\WordParser\FunWithWord\bin\Release\FunWithWord.pdb
 \\srvdfs\Userdir\manager\suvorov\ProjTest\WordParser\FunWithWord\obj\x86\Release\ResolveAssemblyReference.cache
+C:\Users\suvorov.s\Documents\GitHub\WordEstimate\FunWithWord\obj\x86\Release\FunWithWord.csproj.ResolveComReference.cache
+C:\Users\suvorov.s\Documents\GitHub\WordEstimate\FunWithWord\obj\x86\Release\FunWithWord.exe
+C:\Users\suvorov.s\Documents\GitHub\WordEstimate\FunWithWord\obj\x86\Release\FunWithWord.pdb
+C:\Users\suvorov.s\Documents\GitHub\WordEstimate\FunWithWord\obj\x86\Release\FunWithWord.csprojResolveAssemblyReference.cache
+C:\Users\suvorov.s\Documents\GitHub\WordEstimate\FunWithWord\bin\Release\FunWithWord.exe
+C:\Users\suvorov.s\Documents\GitHub\WordEstimate\FunWithWord\bin\Release\FunWithWord.pdb

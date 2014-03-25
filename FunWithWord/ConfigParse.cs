@@ -15,7 +15,7 @@ namespace FunWithWord
         {
             try
             {
-                configFile = new StreamReader(path);
+                configFile = new StreamReader(Environment.CurrentDirectory + "\\" + path);
                 configDictionary = new Dictionary<string, string>();
                 DefaultDictionaryCreate();
             }

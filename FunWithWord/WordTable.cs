@@ -14,11 +14,6 @@ namespace FunWithWord
         Table wordTable;
         Selection selectedTable;
 
-        public Table WTable
-        {
-            get { return wordTable; }
-        }
-
         public WordTable()
         {
             wordApplicationProcessId = 0;
@@ -43,12 +38,11 @@ namespace FunWithWord
 
         public Cell this[int index]
         {
-            get { return wordTable.Range.Cells[index]; }
+            get { return SelectedTable.Cells[index]; }
         }
 
         public void ChooseTable(int tableNumber)
         {
-            wordTable = wordDocument.Tables[tableNumber];
             wordDocument.Tables[tableNumber].Select();
             selectedTable = wordDocument.ActiveWindow.Panes[1].Selection;
         }
@@ -60,12 +54,12 @@ namespace FunWithWord
 
         public Cell GetElement(int index)
         {
-            return wordTable.Range.Cells[index];
+            return selectedTable.Cells[index];
         }
 
         public int GetElementCount
         {
-            get { return wordTable.Range.Cells.Count; }
+            get { return SelectedTable.Cells.Count; }
         }
 
         public void DisconnectFromDocument()

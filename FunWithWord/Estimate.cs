@@ -7,31 +7,13 @@ namespace FunWithWord
 {
     public struct EstimateEquipment         //class for whole estimate (list of EstimateString and additional data)
     {
-        double equipmentCost;
-        double transportCost;
-        double depotCost;
-
-        public double EquipmentCost
-        {
-            get { return equipmentCost; }
-            set { equipmentCost = value; }
-        }
-
-        public double TransportCost
-        {
-            get { return transportCost; }
-            set { transportCost = value; }
-        }
-
-        public double DepotCost
-        {
-            get { return depotCost; }
-            set { depotCost = value; }
-        }
+        public double EquipmentCost { get; set; }
+        public double TransportCost { get; set; }
+        public double DepotCost { get; set; }
 
         public double TotalEquipmentCost
         {
-            get { return equipmentCost + transportCost + depotCost; }
+            get { return EquipmentCost + TransportCost + DepotCost; }
         }
     }
 
@@ -41,9 +23,9 @@ namespace FunWithWord
         EstimateString resumeString;
         EstimateEquipment equip;
         string name;
-        double totalEstimateCost;
-        double overheads;
-        double estimateProfit;
+        public double TotalEstimateCost { get; set; }
+        public double Overheads { get; set; }
+        public double EstimateProfit { get; set; }
 
         public Estimate(string name)
         {
@@ -68,24 +50,6 @@ namespace FunWithWord
             get { return name; }
         }
 
-        public double TotalEstimateCost
-        {
-            get { return totalEstimateCost; }
-            set { totalEstimateCost = value; }
-        }
-
-        public double Overheads
-        {
-            get { return overheads; }
-            set { overheads = value; }
-        }
-
-        public double EstimateProfit 
-        {
-            get { return estimateProfit; }
-            set { estimateProfit = value; }
-        }
-
         public int StringCount
         {
             get { return estimateSet.Count; }
@@ -108,6 +72,11 @@ namespace FunWithWord
             equip.DepotCost = depot;
         }
 
+        public void AddResumeString(EstimateString resume)
+        {
+            resumeString = resume;
+        }
+
         public EstimateEquipment Equipment
         {
             get { return equip; }
@@ -119,20 +88,15 @@ namespace FunWithWord
             get { return resumeString; }
         }
 
-        public void AddResumeString(EstimateString resume)
-        {
-            resumeString = resume;
-        }
-
         public List<EstimateString> EstimateMaterials()
         {
-            List<EstimateString> esl = new List<EstimateString>();
+            List<EstimateString> eslist = new List<EstimateString>();
             foreach (EstimateString es in estimateSet)
             {
                 if ((es.CurrentFOT == 0) && (es.CurrentMachine == 0) && (es.CurrentCost > 0))
-                    esl.Add(es);
+                    eslist.Add(es);
             }
-            return esl;
+            return eslist;
         }
 
         public List<int> CheckMissingStrings()
@@ -163,7 +127,7 @@ namespace FunWithWord
 
         public double CheckCostEquality()
         {
-            return totalEstimateCost - SumStringsCost() - equip.DepotCost - equip.TransportCost - overheads - estimateProfit;
+            return TotalEstimateCost - SumStringsCost() - equip.DepotCost - equip.TransportCost - Overheads - EstimateProfit;
         }
     }
 }

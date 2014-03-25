@@ -7,44 +7,19 @@ namespace FunWithWord
 {
     struct StringCostElements       //struct and class, which present string of estimate, just data
     {
-        double workersPay;
-        double machineWorkersPay;
-        double machineCost;
-        double materialCost;
-        double cost;
+        public double WorkerPay { get; set; }
+        public double MachineWorkersPay { get; set; }
+        public double MachineCost { get; set; }
+        public double MaterialCost { get; set; }
+        public double Cost { get; set; }
 
-        public double WorkerPay
-        {
-            get { return workersPay; }
-            set { workersPay = value; }
-        }
-        public double MachineWorkersPay
-        {
-            get { return machineWorkersPay; }
-            set { machineWorkersPay = value; }
-        }
-        public double MachineCost
-        {
-            get { return machineCost;}
-            set { machineCost = value; }
-        }
-        public double MaterialCost
-        {
-            get { return materialCost; }
-            set { materialCost = value; }
-        }
         public double FOT
         {
-            get { return workersPay + machineWorkersPay; }
+            get { return WorkerPay + MachineWorkersPay; }
         }
         public double CalcCost
         {
-            get { return workersPay + machineCost + materialCost; }
-        }
-        public double Cost
-        {
-            get { return cost; }
-            set { cost = value; }
+            get { return WorkerPay + MachineCost + MaterialCost; }
         }
     }
 

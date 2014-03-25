@@ -16,3 +16,8 @@ C:\Users\Sergey\documents\visual studio 2010\Projects\FunWithWord\FunWithWord\ob
 \\srvdfs\Userdir\manager\suvorov\ProjTest\WordParser\FunWithWord\bin\Debug\FunWithWord.exe
 \\srvdfs\Userdir\manager\suvorov\ProjTest\WordParser\FunWithWord\bin\Debug\FunWithWord.pdb
 \\srvdfs\Userdir\manager\suvorov\ProjTest\WordParser\FunWithWord\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\suvorov.s\Documents\GitHub\WordEstimate\FunWithWord\obj\x86\Debug\FunWithWord.csproj.ResolveComReference.cache
+C:\Users\suvorov.s\Documents\GitHub\WordEstimate\FunWithWord\obj\x86\Debug\FunWithWord.exe
+C:\Users\suvorov.s\Documents\GitHub\WordEstimate\FunWithWord\obj\x86\Debug\FunWithWord.pdb
+C:\Users\suvorov.s\Documents\GitHub\WordEstimate\FunWithWord\bin\Debug\FunWithWord.exe
+C:\Users\suvorov.s\Documents\GitHub\WordEstimate\FunWithWord\bin\Debug\FunWithWord.pdb
