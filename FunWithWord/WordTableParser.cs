@@ -1,5 +1,4 @@
-﻿//#define DEBUG
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,12 +21,15 @@ namespace FunWithWord
         const string ISTOTALPATTERN = "TotalStringPattern";
         const string ISOVERHEADSPATTERN = "OverheadStringPattern";
         const string ISESTIMATEPROFITPATTERN = "EstimateProfitStringPattern";
+        const string ISSTRINGCONDITIONPATTERN = "StringConditionPattern";
 
         const string ELEMENTSSCHEME = "ElementsScheme";
         const string ESTIMATESTRINGSCHEME = "EstimateStringScheme";
         const string RESUMETRINGSCHEME = "ResumeStringScheme";
         const string COMMONSTRINGCOSTSCHEME = "CommonStringCostScheme";
+        const string HEADERSCHEME = "HeaderScheme";
 
+        const string FIRSTCELL = "FirstCell";
         const string NUMBER = "Number";
         const string NAME = "Name";
         const string VOLUME = "Volume";
@@ -36,6 +38,11 @@ namespace FunWithWord
         const string MACHINE = "Machine";
 	    const string MATERIAL = "Material";
         const string MACHINEPAY = "MachinePay";
+
+        const string OVERHEADS = "Overheads";
+        const string PROFIT = "Profit";
+        const string TOTALCOST = "TotalCost";
+        const string CONDITION = "StringCondition";
 
         
         WordTable tableForParse;
@@ -47,6 +54,7 @@ namespace FunWithWord
         int resumeShiftFirst, resumeShiftLength;
         Dictionary<string, int> costShiftDictionary;        //for the other elements like equipment, estimate profit etc. (only cost pulling)
         int costShiftFirst, costShiftLength;
+        Dictionary<string, int> headerShiftDictionary;      //for estimate header with it's name and number
 
         public WordTableParser()            //fillind dictionaries with values from config file, end Excel templates file
         {
@@ -56,13 +64,15 @@ namespace FunWithWord
             ElementTemplate templ = new ElementTemplate(configDictionary[ELEMENTSSCHEME]);
             stringShiftFirst = 0; stringShiftLength = 0;
             stringShiftDictionary = templ.ValuesShift(configDictionary[ESTIMATESTRINGSCHEME], NUMBER, 
-                new string[] { NAME, VOLUME, COST, PAY, MACHINE, MATERIAL, MACHINEPAY }, out stringShiftFirst, out stringShiftLength);
+                new string[] { NAME, VOLUME, COST, PAY, MACHINE, MATERIAL, MACHINEPAY, OVERHEADS, PROFIT, TOTALCOST, CONDITION }, out stringShiftFirst, out stringShiftLength);
             resumeShiftFirst = 0; resumeShiftLength = 0;
             resumeShiftDictionary = templ.ValuesShift(configDictionary[RESUMETRINGSCHEME], NAME,
                 new string[] { COST, PAY, MACHINE, MATERIAL, MACHINEPAY }, out resumeShiftFirst, out resumeShiftLength);
             costShiftFirst = 0; costShiftLength = 0;
             costShiftDictionary = templ.ValuesShift(configDictionary[COMMONSTRINGCOSTSCHEME], NAME,
                 new string[] { COST }, out costShiftFirst, out costShiftLength);
+           // headerShiftDictionary = templ.ValuesShift(configDictionary[HEADERSCHEME], FIRSTCELL,
+               // new string[] { NUMBER, NAME });
             templ.Dispose();
 #if (DEBUG)
             #region Configuration files structure
@@ -101,7 +111,7 @@ namespace FunWithWord
         {
             tableForParse.ConnectToDocment(filepath);
             tableForParse.ChooseTable(Convert.ToInt32(configDictionary[TABLENUMBER]));
-            Estimate es = new Estimate(filepath.Substring(filepath.LastIndexOf("\\")+1));
+            Estimate es = new Estimate(filepath.Substring(filepath.LastIndexOf("\\") + 1));
             double equip = 0, depot = 0, transport = 0;
             bool isResumeFind = false;
             foreach (Cell currentCell in tableForParse.SelectedTable.Cells)         //check every cell in table and by regexp pattern try to find interesting element
@@ -137,9 +147,9 @@ namespace FunWithWord
                     //i += Convert.ToInt32(resumeShiftLength);
                     continue;
                 }                                                                                           //like the other strings, necessary to us
-                else if ((isResumeFind) && (Regex.IsMatch(currentCellText, configDictionary[ISTOTALPATTERN]))) es.TotalEstimateCost = ParsingCost(currentCell);
-                else if ((isResumeFind) && (Regex.IsMatch(currentCellText, configDictionary[ISOVERHEADSPATTERN]))) es.Overheads = ParsingCost(currentCell);
-                else if ((isResumeFind) && (Regex.IsMatch(currentCellText, configDictionary[ISESTIMATEPROFITPATTERN]))) es.EstimateProfit = ParsingCost(currentCell);
+                else if ((isResumeFind) && (Regex.IsMatch(currentCellText, configDictionary[ISTOTALPATTERN]))) es.ResumeString.CurrentTotalCost = ParsingCost(currentCell); 
+                else if ((isResumeFind) && (Regex.IsMatch(currentCellText, configDictionary[ISOVERHEADSPATTERN]))) es.ResumeString.CurrentOverheads = ParsingCost(currentCell);
+                else if ((isResumeFind) && (Regex.IsMatch(currentCellText, configDictionary[ISESTIMATEPROFITPATTERN]))) es.ResumeString.CurrentProfit = ParsingCost(currentCell);
                 else if (Regex.IsMatch(currentCellText, configDictionary[ISEQUIPMENTPATTERN])) equip = ParsingCost(currentCell);
                 else if (Regex.IsMatch(currentCellText, configDictionary[ISDEPOTPATTERN])) depot = ParsingCost(currentCell);
                 else if (Regex.IsMatch(currentCellText, configDictionary[ISTRANSPORTPATTERN])) transport = ParsingCost(currentCell);
@@ -158,23 +168,23 @@ namespace FunWithWord
             string namecaption = CellShift(firstCell, stringShiftDictionary[NAME]).Range.Text;  //found name and caption by positions of cells versus cell with number
             int divider = namecaption.IndexOf(Convert.ToChar(13));
             resultString.Name = namecaption.Substring(0, divider - 1);
-            resultString.Caption = namecaption.Substring(divider + 1, namecaption.Length - divider-1);
-            try
-            {                                                                                   //as well found another data
-                if ((stringShiftDictionary.ContainsKey(VOLUME))&&(NormalizeNumber(CellShift(firstCell, stringShiftDictionary[VOLUME]).Range.Text) != ""))
-                    resultString.Volume = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, stringShiftDictionary[VOLUME]).Range.Text));
-                if ((stringShiftDictionary.ContainsKey(COST)) && (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[COST]).Range.Text) != ""))
-                    resultString.CurrentCost = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, stringShiftDictionary[COST]).Range.Text));
-                if ((stringShiftDictionary.ContainsKey(PAY)) && (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[PAY]).Range.Text) != ""))
-                    resultString.CurrentWorkers = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, stringShiftDictionary[PAY]).Range.Text));
-                if ((stringShiftDictionary.ContainsKey(MACHINE)) && (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MACHINE]).Range.Text) != ""))
-                    resultString.CurrentMachine = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MACHINE]).Range.Text));
-                if ((stringShiftDictionary.ContainsKey(MATERIAL)) && (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MATERIAL]).Range.Text) != ""))
-                    resultString.CurrentMaterials = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MATERIAL]).Range.Text));
-                if ((stringShiftDictionary.ContainsKey(MACHINEPAY)) && (NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MACHINEPAY]).Range.Text) != ""))
-                    resultString.CurrentMachineWorkers = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, stringShiftDictionary[MACHINEPAY]).Range.Text));
+            resultString.Caption = namecaption.Substring(divider + 1, namecaption.Length - divider-1);                                      
+            int conditionShift = Int32.MaxValue;
+            if (stringShiftDictionary.ContainsKey(CONDITION))
+            {
+                Cell conditionCell = CellShift(firstCell, stringShiftDictionary[CONDITION]);
+                if (!Regex.IsMatch(conditionCell.Range.Text, configDictionary[ISSTRINGCONDITIONPATTERN]))
+                    conditionShift = stringShiftDictionary[CONDITION];
             }
-            catch { return null; }
+            resultString.Volume = ParsingElement(firstCell, VOLUME, stringShiftDictionary, conditionShift);
+            resultString.CurrentCost = ParsingElement(firstCell, COST, stringShiftDictionary, conditionShift);
+            resultString.CurrentWorkers = ParsingElement(firstCell, PAY, stringShiftDictionary, conditionShift);
+            resultString.CurrentMachine = ParsingElement(firstCell, MACHINE, stringShiftDictionary, conditionShift);
+            resultString.CurrentMaterials = ParsingElement(firstCell, MATERIAL, stringShiftDictionary, conditionShift);
+            resultString.CurrentMachineWorkers = ParsingElement(firstCell, MACHINEPAY, stringShiftDictionary, conditionShift);
+            resultString.CurrentOverheads = ParsingElement(firstCell, OVERHEADS, stringShiftDictionary, conditionShift);
+            resultString.CurrentProfit = ParsingElement(firstCell, PROFIT, stringShiftDictionary, conditionShift);
+            resultString.CurrentTotalCost = ParsingElement(firstCell, TOTALCOST, stringShiftDictionary, conditionShift);
             return resultString;
         }
 
@@ -182,21 +192,12 @@ namespace FunWithWord
         {
             EstimateString resultString = new EstimateString(0);
             resultString.Name = firstCell.Range.Text;
-            resultString.Volume = 0;
-            try
-            {
-                if ((resumeShiftDictionary.ContainsKey(COST))&&(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[COST]).Range.Text) != ""))
-                    resultString.CurrentCost = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[COST]).Range.Text));
-                if ((resumeShiftDictionary.ContainsKey(PAY))&&(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[PAY]).Range.Text) != ""))
-                    resultString.CurrentWorkers = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[PAY]).Range.Text));
-                if ((resumeShiftDictionary.ContainsKey(MACHINE))&&(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MACHINE]).Range.Text) != ""))
-                    resultString.CurrentMachine = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MACHINE]).Range.Text));
-                if ((resumeShiftDictionary.ContainsKey(MATERIAL))&&(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MATERIAL]).Range.Text) != ""))
-                    resultString.CurrentMaterials = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MATERIAL]).Range.Text));
-                if ((resumeShiftDictionary.ContainsKey(MACHINEPAY))&&(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MACHINEPAY]).Range.Text) != ""))
-                    resultString.CurrentMachineWorkers = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, resumeShiftDictionary[MACHINEPAY]).Range.Text));
-            }
-            catch { return null; }
+            resultString.Volume = 0.0;
+            resultString.CurrentCost = ParsingElement(firstCell, COST, resumeShiftDictionary);
+            resultString.CurrentWorkers = ParsingElement(firstCell, PAY, resumeShiftDictionary);
+            resultString.CurrentMachine = ParsingElement(firstCell, MACHINE, resumeShiftDictionary);
+            resultString.CurrentMaterials = ParsingElement(firstCell, MATERIAL, resumeShiftDictionary);
+            resultString.CurrentMachineWorkers = ParsingElement(firstCell, MACHINEPAY, resumeShiftDictionary);
 #if (DEBUG)
                 #region resume parsing
                 if  (resultString.CurrentCost != resultString.CurrentWorkers + resultString.CurrentMachine + resultString.CurrentMaterials)
@@ -210,14 +211,22 @@ namespace FunWithWord
 
         double ParsingCost(Cell firstCell)      //and another parsing function for the other elemtns (only cost getting)
         {
-            double resultcost = 0;
-            try
-            {
-                if ((costShiftDictionary.ContainsKey(COST))&&(NormalizeNumber(CellShift(firstCell, costShiftDictionary[COST]).Range.Text) != ""))
-                    resultcost = Convert.ToDouble(NormalizeNumber(CellShift(firstCell, costShiftDictionary[COST]).Range.Text));
-            }
-            catch { return 0; }
-            return resultcost;
+            return ParsingElement(firstCell, COST, costShiftDictionary);
+        }
+
+        double ParsingElement(Cell firstCell, string element, Dictionary<string, int> dict, int additionCondition = Int32.MaxValue) //one element parsing with it's name and dictionary
+        {
+            if ((!dict.ContainsKey(element)) || (dict[element] > additionCondition)) return 0.0;
+            Cell elementCell = CellShift(firstCell, dict[element]);
+            string normalizeElementValue = NormalizeNumber(elementCell.Range.Text);
+            double elementValue = 0.0;
+            if (normalizeElementValue != "")
+                try
+                {
+                    elementValue = Convert.ToDouble(normalizeElementValue);
+                }
+                catch { return 0.0; }
+            return elementValue;
         }
 
         Cell CellShift(Cell inputCell, int shift) //return cell of table, shifted versus inputCell at needed count of cells

@@ -22,17 +22,17 @@ namespace FunWithWord
         List<EstimateString> estimateSet;
         EstimateString resumeString;
         EstimateEquipment equip;
-        string name;
-        public double TotalEstimateCost { get; set; }
-        public double Overheads { get; set; }
-        public double EstimateProfit { get; set; }
+        string filename;
+        public string Code { get; set; }
+        public string Name { get; set; }
 
-        public Estimate(string name)
+        public Estimate(string filename)
         {
             estimateSet = new List<EstimateString>();
             resumeString = new EstimateString(0);
             equip = new EstimateEquipment();
-            this.name = name;
+            this.filename = filename;
+            this.Name = filename; // todo
         }
 
         public EstimateString this[int index]
@@ -43,11 +43,6 @@ namespace FunWithWord
         public void Add(EstimateString newEsStr)
         {
             estimateSet.Add(newEsStr);
-        }
-
-        public string Name
-        {
-            get { return name; }
         }
 
         public int StringCount
@@ -99,6 +94,13 @@ namespace FunWithWord
             return eslist;
         }
 
+        public string[] ToStringArray()
+        {
+            return new string[] { Name, resumeString.CurrentWorkers.ToString(), resumeString.CurrentMachine.ToString(), resumeString.CurrentMachineWorkers.ToString(),
+                                resumeString.CurrentMaterials.ToString(), resumeString.CurrentCost.ToString(), Equipment.EquipmentCost.ToString(), Equipment.DepotCost.ToString(),
+                                Equipment.TransportCost.ToString(), resumeString.CurrentOverheads.ToString(), resumeString.CurrentProfit.ToString(), resumeString.CurrentTotalCost.ToString()};
+        }
+
         public List<int> CheckMissingStrings()
         {
             List<int> elementnumbers = (List<int>)estimateSet.Select(x => x.Number);
@@ -127,7 +129,7 @@ namespace FunWithWord
 
         public double CheckCostEquality()
         {
-            return TotalEstimateCost - SumStringsCost() - equip.DepotCost - equip.TransportCost - Overheads - EstimateProfit;
+            return ResumeString.CurrentTotalCost - SumStringsCost() - Equipment.DepotCost - Equipment.TransportCost - ResumeString.CurrentOverheads - ResumeString.CurrentProfit;
         }
     }
 }

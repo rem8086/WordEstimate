@@ -12,6 +12,9 @@ namespace FunWithWord
         public double MachineCost { get; set; }
         public double MaterialCost { get; set; }
         public double Cost { get; set; }
+        public double Overheads { get; set; }
+        public double Profit { get; set; }
+        public double TotalCost { get; set; }
 
         public double FOT
         {
@@ -89,16 +92,34 @@ namespace FunWithWord
             set { currentCost.MachineWorkersPay = value; }
         }
 
-        public int CompareTo(object otherstring)
-        {
-            EstimateString es = otherstring as EstimateString;
-            return this.number.CompareTo(es.Number);
-        }
-
         public double CurrentCost
         {
             get { return currentCost.Cost; }
             set { currentCost.Cost = value; }
+        }
+
+        public double CurrentOverheads 
+        {
+            get { return currentCost.Overheads; }
+            set { currentCost.Overheads = value; }
+        }
+
+        public double CurrentProfit
+        {
+            get { return currentCost.Profit; }
+            set { currentCost.Profit = value; }
+        }
+
+        public double CurrentTotalCost
+        {
+            get { return currentCost.TotalCost; }
+            set { currentCost.TotalCost = value; }
+        }
+
+        public int CompareTo(object otherstring)
+        {
+            EstimateString es = otherstring as EstimateString;
+            return this.number.CompareTo(es.Number);
         }
 
         public override string ToString()
@@ -111,8 +132,9 @@ namespace FunWithWord
         public string[] ToStringArray()
         {
             return new string[]{
-                number.ToString(), name, caption, volume.ToString(), currentCost.WorkerPay.ToString(), currentCost.MachineCost.ToString(), 
-                currentCost.MachineWorkersPay.ToString(), currentCost.MaterialCost.ToString(), currentCost.Cost.ToString()
+                number.ToString(), Name, Caption, Volume.ToString(), CurrentWorkers.ToString(), CurrentMachine.ToString(), 
+                CurrentMachineWorkers.ToString(), CurrentMaterials.ToString(), CurrentCost.ToString(), CurrentOverheads.ToString(),
+                CurrentProfit.ToString(), CurrentTotalCost.ToString()
             };
         }
     }

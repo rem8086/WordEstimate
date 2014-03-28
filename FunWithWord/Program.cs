@@ -1,5 +1,4 @@
-﻿//#define DEBUG
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +11,6 @@ namespace FunWithWord
     class Program
     {
         const int BORDEROFUNVISIBLECHARS = 32;
-        const string CONFIGFILEPATH = "config.ini";
         
         static void Main(string[] args)
         {

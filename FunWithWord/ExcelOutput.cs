@@ -60,6 +60,9 @@ namespace FunWithWord
             wsEstimateStrings.Cells[wsEstimateStringsRowCount, 8].Value = "PayMachine";
             wsEstimateStrings.Cells[wsEstimateStringsRowCount, 9].Value = "Materials";
             wsEstimateStrings.Cells[wsEstimateStringsRowCount, 10].Value = "Cost";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 11].Value = "Overheads";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 12].Value = "Profit";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 13].Value = "Total";
             wsEstimateStrings.Rows[wsEstimateStringsRowCount].Font.Bold = true;
             wsEstimateStringsRowCount++;
             wsMaterialStrings.Cells[wsMaterialStringsRowCount, 1].Value = "Estimate Name";
@@ -119,22 +122,12 @@ namespace FunWithWord
 
         void ResumesFill()          //page with resumes
         {
-            for (int i = 1; i < 13; i++)
+            string[] data = inputEstimate.ToStringArray();
+            for (int i = 0; i < data.Length; i++)
             {
-                wsResumes.Cells[wsResumesRowCount, i].NumberFormat = "@";
+                wsResumes.Cells[wsResumesRowCount, i + 1].NumberFormat = "@";
+                wsResumes.Cells[wsResumesRowCount, i + 1].Value = data[i];
             }
-            wsResumes.Cells[wsResumesRowCount, 1].Value = inputEstimate.Name;
-            wsResumes.Cells[wsResumesRowCount, 2].Value = inputEstimate.ResumeString.CurrentWorkers;
-            wsResumes.Cells[wsResumesRowCount, 3].Value = inputEstimate.ResumeString.CurrentMachine;
-            wsResumes.Cells[wsResumesRowCount, 4].Value = inputEstimate.ResumeString.CurrentMachineWorkers;
-            wsResumes.Cells[wsResumesRowCount, 5].Value = inputEstimate.ResumeString.CurrentMaterials;
-            wsResumes.Cells[wsResumesRowCount, 6].Value = inputEstimate.ResumeString.CurrentCost;
-            wsResumes.Cells[wsResumesRowCount, 7].Value = inputEstimate.Equipment.EquipmentCost;
-            wsResumes.Cells[wsResumesRowCount, 8].Value = inputEstimate.Equipment.DepotCost;
-            wsResumes.Cells[wsResumesRowCount, 9].Value = inputEstimate.Equipment.TransportCost;
-            wsResumes.Cells[wsResumesRowCount, 10].Value = inputEstimate.Overheads;
-            wsResumes.Cells[wsResumesRowCount, 11].Value = inputEstimate.EstimateProfit;
-            wsResumes.Cells[wsResumesRowCount, 12].Value = inputEstimate.TotalEstimateCost;
             wsResumesRowCount++;
         }          
     }
