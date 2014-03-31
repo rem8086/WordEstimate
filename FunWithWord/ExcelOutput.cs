@@ -102,6 +102,7 @@ namespace FunWithWord
             {
                 string[] data = inputEstimate[i].ToStringArray();
                 wsEstimateStrings.Cells[wsEstimateStringsRowCount, 1].Value = inputEstimate.FileName;
+                wsEstimateStrings.Cells[wsEstimateStringsRowCount, 2].Format = "@";
                 wsEstimateStrings.Cells[wsEstimateStringsRowCount, 2].Value = inputEstimate.Code;
                 wsEstimateStrings.Cells[wsEstimateStringsRowCount, 3].Value = inputEstimate.Name;
                 for (int j = 0; j < data.Length; j++)
@@ -119,6 +120,7 @@ namespace FunWithWord
             {
                 string[] data = ess.ToStringArray();
                 wsMaterialStrings.Cells[wsMaterialStringsRowCount, 1].Value = inputEstimate.FileName;
+                wsMaterialStrings.Cells[wsMaterialStringsRowCount, 2].Format = "@";
                 wsMaterialStrings.Cells[wsMaterialStringsRowCount, 2].Value = inputEstimate.Code;
                 wsMaterialStrings.Cells[wsMaterialStringsRowCount, 3].Value = inputEstimate.Name;
                 for (int j = 0; j < data.Length; j++)
