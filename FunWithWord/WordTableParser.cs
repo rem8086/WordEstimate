@@ -13,6 +13,8 @@ namespace FunWithWord
     {
         const string CONFIGPATH = "config.ini";         // program constants - name of config file, and names of config file elements
         const string TABLENUMBER = "TableNumber";
+        const string HEADERTABLENUMBER = "HeaderTableNumber";
+        const string ESTIMATECODEPATTERN = "EstimateCodePattern";
         const string ISNUMBERPATTERN = "StringNumberPattern";
         const string ISRESUMEPATTERN = "ResumeStringPattern";
         const string ISEQUIPMENTPATTERN = "EquipmentStringPattern";
@@ -49,11 +51,11 @@ namespace FunWithWord
         Dictionary<string, string> configDictionary;    // dictionary with config elements with values from config file
                                                             //three dictionaries with relative positions of needed elements (like volume, cost, machine cost, material cost)
         Dictionary<string, int> stringShiftDictionary;      //for every estimate string (each elementary work in estimate)
-        int stringShiftFirst, stringShiftLength;
+        int stringShiftFirst;
         Dictionary<string, int> resumeShiftDictionary;      //for total estimate resume 
-        int resumeShiftFirst, resumeShiftLength;
+        int resumeShiftFirst;
         Dictionary<string, int> costShiftDictionary;        //for the other elements like equipment, estimate profit etc. (only cost pulling)
-        int costShiftFirst, costShiftLength;
+        int costShiftFirst;
         Dictionary<string, int> headerShiftDictionary;      //for estimate header with it's name and number
 
         public WordTableParser()            //fillind dictionaries with values from config file, end Excel templates file
@@ -62,17 +64,18 @@ namespace FunWithWord
             ConfigParse config = new ConfigParse(CONFIGPATH);
             configDictionary = config.Parsing();                
             ElementTemplate templ = new ElementTemplate(configDictionary[ELEMENTSSCHEME]);
-            stringShiftFirst = 0; stringShiftLength = 0;
+            stringShiftFirst = 0;
             stringShiftDictionary = templ.ValuesShift(configDictionary[ESTIMATESTRINGSCHEME], NUMBER, 
-                new string[] { NAME, VOLUME, COST, PAY, MACHINE, MATERIAL, MACHINEPAY, OVERHEADS, PROFIT, TOTALCOST, CONDITION }, out stringShiftFirst, out stringShiftLength);
-            resumeShiftFirst = 0; resumeShiftLength = 0;
+                new string[] { NAME, VOLUME, COST, PAY, MACHINE, MATERIAL, MACHINEPAY, OVERHEADS, PROFIT, TOTALCOST, CONDITION }, out stringShiftFirst);
+            resumeShiftFirst = 0;
             resumeShiftDictionary = templ.ValuesShift(configDictionary[RESUMETRINGSCHEME], NAME,
-                new string[] { COST, PAY, MACHINE, MATERIAL, MACHINEPAY }, out resumeShiftFirst, out resumeShiftLength);
-            costShiftFirst = 0; costShiftLength = 0;
+                new string[] { COST, PAY, MACHINE, MATERIAL, MACHINEPAY }, out resumeShiftFirst);
+            costShiftFirst = 0; 
             costShiftDictionary = templ.ValuesShift(configDictionary[COMMONSTRINGCOSTSCHEME], NAME,
-                new string[] { COST }, out costShiftFirst, out costShiftLength);
-           // headerShiftDictionary = templ.ValuesShift(configDictionary[HEADERSCHEME], FIRSTCELL,
-               // new string[] { NUMBER, NAME });
+                new string[] { COST }, out costShiftFirst);
+            int first = 0;          //whatta hell
+            headerShiftDictionary = templ.ValuesShift(configDictionary[HEADERSCHEME], FIRSTCELL,
+                new string[] { NUMBER, NAME }, out first);
             templ.Dispose();
 #if (DEBUG)
             #region Configuration files structure
@@ -110,8 +113,13 @@ namespace FunWithWord
         public Estimate Parsing(string filepath)    //main function - pull estimate data from Word file
         {
             tableForParse.ConnectToDocment(filepath);
-            tableForParse.ChooseTable(Convert.ToInt32(configDictionary[TABLENUMBER]));
             Estimate es = new Estimate(filepath.Substring(filepath.LastIndexOf("\\") + 1));
+            tableForParse.ChooseTable(Convert.ToInt32(configDictionary[HEADERTABLENUMBER]));
+            string estimateCode, estimateName;
+            ParsingHeader(out estimateCode, out estimateName);
+            es.Code = estimateCode;
+            es.Name = estimateName;
+            tableForParse.ChooseTable(Convert.ToInt32(configDictionary[TABLENUMBER]));
             double equip = 0, depot = 0, transport = 0;
             bool isResumeFind = false;
             foreach (Cell currentCell in tableForParse.SelectedTable.Cells)         //check every cell in table and by regexp pattern try to find interesting element
@@ -209,7 +217,7 @@ namespace FunWithWord
             return resultString;
         }
 
-        double ParsingCost(Cell firstCell)      //and another parsing function for the other elemtns (only cost getting)
+        double ParsingCost(Cell firstCell)      //and another parsing function for the other elements (only cost getting)
         {
             return ParsingElement(firstCell, COST, costShiftDictionary);
         }
@@ -227,6 +235,22 @@ namespace FunWithWord
                 }
                 catch { return 0.0; }
             return elementValue;
+        }
+
+        void ParsingHeader(out string estimateCode, out string estimateName)
+        {
+            Cell firstCell = tableForParse.SelectedTable.Cells[1];
+            try
+            {
+                estimateCode = CellShift(firstCell, headerShiftDictionary[NUMBER]).Range.Text;
+            }
+            catch { estimateCode = ""; }
+            estimateCode = Regex.Match(estimateCode, configDictionary[ESTIMATECODEPATTERN]).Value;
+            try
+            {
+                estimateName = CellShift(firstCell, headerShiftDictionary[NAME]).Range.Text;
+            }
+            catch { estimateName = ""; }
         }
 
         Cell CellShift(Cell inputCell, int shift) //return cell of table, shifted versus inputCell at needed count of cells

@@ -28,11 +28,12 @@ namespace FunWithWord
         void DefaultDictionaryCreate() // filling parametr dictionary with default values
         {
             configDictionary.Add("TableNumber", "3");
+            configDictionary.Add("HeaderTableNumber", "1");
             configDictionary.Add("ElementsScheme", "PartsOfEstimate_Scheme.xls");
             configDictionary.Add("EstimateStringScheme", "String");
             configDictionary.Add("ResumeStringScheme", "Resume");
             configDictionary.Add("CommonStringCostScheme", "Cost");
-            configDictionary.Add("HeaderScheme ", "Header");
+            configDictionary.Add("HeaderScheme", "Header");
             configDictionary.Add("StringNumberPattern", "^[0-9]{1,}\\.$");
             configDictionary.Add("ResumeStringPattern", "ИТОГО[\\s]{1,}ПО[\\s]{1,}СМЕТЕ");
             configDictionary.Add("EquipmentStringPattern", "СТОИМОСТЬ[\\s]{1,}ОБОРУДОВАНИЯ");
@@ -41,7 +42,8 @@ namespace FunWithWord
             configDictionary.Add("TotalStringPattern", "ВСЕГО[\\s]{1,}ПО[\\s]{1,}СМЕТЕ");
             configDictionary.Add("OverheadStringPattern", "ВСЕГО НАКЛАДНЫЕ РАСХОДЫ");
             configDictionary.Add("EstimateProfitStringPattern", "ВСЕГО СМЕТНАЯ ПРИБЫЛЬ");
-            configDictionary.Add("StringConditionPattern", "Накладные[\\s]{1,}расходы"); 
+            configDictionary.Add("StringConditionPattern", "Накладные[\\s]{1,}расходы");
+            configDictionary.Add("EstimateCodePattern", "[0-9,-]{1,}");
         }
 
         public Dictionary<string, string> Parsing() //procedure of config file parsing

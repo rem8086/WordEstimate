@@ -11,7 +11,6 @@ namespace FunWithWord
     {
         int wordApplicationProcessId;
         Document wordDocument;
-        Table wordTable;
         Selection selectedTable;
 
         public WordTable()

@@ -50,42 +50,48 @@ namespace FunWithWord
 
         void TitlesFill()       //titles and formating
         {
-            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 1].Value = "Estimate Name";
-            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 2].Value = "Number";
-            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 3].Value = "Name";
-            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 4].Value = "Caption";
-            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 5].Value = "Volume";
-            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 6].Value = "Pay";
-            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 7].Value = "Machine";
-            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 8].Value = "PayMachine";
-            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 9].Value = "Materials";
-            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 10].Value = "Cost";
-            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 11].Value = "Overheads";
-            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 12].Value = "Profit";
-            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 13].Value = "Total";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 1].Value = "File Name";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 2].Value = "Estimate Code";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 3].Value = "Estimate Name";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 4].Value = "Number";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 5].Value = "Name";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 6].Value = "Caption";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 7].Value = "Volume";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 8].Value = "Pay";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 9].Value = "Machine";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 10].Value = "PayMachine";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 11].Value = "Materials";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 12].Value = "Cost";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 13].Value = "Overheads";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 14].Value = "Profit";
+            wsEstimateStrings.Cells[wsEstimateStringsRowCount, 15].Value = "Total";
             wsEstimateStrings.Rows[wsEstimateStringsRowCount].Font.Bold = true;
             wsEstimateStringsRowCount++;
-            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 1].Value = "Estimate Name";
-            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 2].Value = "Number";
-            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 3].Value = "Name";
-            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 4].Value = "Caption";
-            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 5].Value = "Volume";
-            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 9].Value = "Materials";
-            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 10].Value = "Cost";
+            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 1].Value = "File Name";
+            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 2].Value = "Estimate Code";
+            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 3].Value = "Estimate Name";
+            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 4].Value = "Number";
+            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 5].Value = "Name";
+            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 6].Value = "Caption";
+            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 7].Value = "Volume";
+            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 11].Value = "Materials";
+            wsMaterialStrings.Cells[wsMaterialStringsRowCount, 12].Value = "Cost";
             wsMaterialStrings.Rows[wsMaterialStringsRowCount].Font.Bold = true;
             wsMaterialStringsRowCount++;
-            wsResumes.Cells[wsResumesRowCount, 1].Value = "Estimate Name";
-            wsResumes.Cells[wsResumesRowCount, 2].Value = "Pay";
-            wsResumes.Cells[wsResumesRowCount, 3].Value = "Machine";
-            wsResumes.Cells[wsResumesRowCount, 4].Value = "PayMachine";
-            wsResumes.Cells[wsResumesRowCount, 5].Value = "Materials";
-            wsResumes.Cells[wsResumesRowCount, 6].Value = "Cost";
-            wsResumes.Cells[wsResumesRowCount, 7].Value = "Equipment";
-            wsResumes.Cells[wsResumesRowCount, 8].Value = "Depot";
-            wsResumes.Cells[wsResumesRowCount, 9].Value = "Transport";
-            wsResumes.Cells[wsResumesRowCount, 10].Value = "Overhead";
-            wsResumes.Cells[wsResumesRowCount, 11].Value = "Profit";
-            wsResumes.Cells[wsResumesRowCount, 12].Value = "Total";
+            wsResumes.Cells[wsResumesRowCount, 1].Value = "File Name";
+            wsResumes.Cells[wsResumesRowCount, 2].Value = "Estimate Code";
+            wsResumes.Cells[wsResumesRowCount, 3].Value = "Estimate Name";
+            wsResumes.Cells[wsResumesRowCount, 4].Value = "Pay";
+            wsResumes.Cells[wsResumesRowCount, 5].Value = "Machine";
+            wsResumes.Cells[wsResumesRowCount, 6].Value = "PayMachine";
+            wsResumes.Cells[wsResumesRowCount, 7].Value = "Materials";
+            wsResumes.Cells[wsResumesRowCount, 8].Value = "Cost";
+            wsResumes.Cells[wsResumesRowCount, 9].Value = "Equipment";
+            wsResumes.Cells[wsResumesRowCount, 10].Value = "Depot";
+            wsResumes.Cells[wsResumesRowCount, 11].Value = "Transport";
+            wsResumes.Cells[wsResumesRowCount, 12].Value = "Overhead";
+            wsResumes.Cells[wsResumesRowCount, 13].Value = "Profit";
+            wsResumes.Cells[wsResumesRowCount, 14].Value = "Total";
             wsResumes.Rows[wsResumesRowCount].Font.Bold = true;
             wsResumesRowCount++;
         }
@@ -95,11 +101,13 @@ namespace FunWithWord
             for (int i = 0; i < inputEstimate.StringCount; i++)
             {
                 string[] data = inputEstimate[i].ToStringArray();
-                wsEstimateStrings.Cells[wsEstimateStringsRowCount, 1].Value = inputEstimate.Name;
+                wsEstimateStrings.Cells[wsEstimateStringsRowCount, 1].Value = inputEstimate.FileName;
+                wsEstimateStrings.Cells[wsEstimateStringsRowCount, 2].Value = inputEstimate.Code;
+                wsEstimateStrings.Cells[wsEstimateStringsRowCount, 3].Value = inputEstimate.Name;
                 for (int j = 0; j < data.Length; j++)
                 {
-                    wsEstimateStrings.Cells[wsEstimateStringsRowCount, j + 2].NumberFormat = "@";
-                    wsEstimateStrings.Cells[wsEstimateStringsRowCount, j + 2].Value = data[j];
+                    wsEstimateStrings.Cells[wsEstimateStringsRowCount, j + 4].NumberFormat = "@";
+                    wsEstimateStrings.Cells[wsEstimateStringsRowCount, j + 4].Value = data[j];
                 }
                 wsEstimateStringsRowCount++;
             }
@@ -110,11 +118,13 @@ namespace FunWithWord
             foreach (EstimateString ess in inputEstimate.EstimateMaterials())
             {
                 string[] data = ess.ToStringArray();
-                wsMaterialStrings.Cells[wsMaterialStringsRowCount, 1].Value = inputEstimate.Name;
+                wsMaterialStrings.Cells[wsMaterialStringsRowCount, 1].Value = inputEstimate.FileName;
+                wsMaterialStrings.Cells[wsMaterialStringsRowCount, 2].Value = inputEstimate.Code;
+                wsMaterialStrings.Cells[wsMaterialStringsRowCount, 3].Value = inputEstimate.Name;
                 for (int j = 0; j < data.Length; j++)
                 {
-                    wsMaterialStrings.Cells[wsMaterialStringsRowCount, j + 2].NumberFormat = "@";
-                    wsMaterialStrings.Cells[wsMaterialStringsRowCount, j + 2].Value = data[j];
+                    wsMaterialStrings.Cells[wsMaterialStringsRowCount, j + 4].NumberFormat = "@";
+                    wsMaterialStrings.Cells[wsMaterialStringsRowCount, j + 4].Value = data[j];
                 }
                 wsMaterialStringsRowCount++;
             }

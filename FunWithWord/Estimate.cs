@@ -35,6 +35,11 @@ namespace FunWithWord
             this.Name = filename; // todo
         }
 
+        public string FileName
+        {
+            get { return filename; }
+        }
+
         public EstimateString this[int index]
         {
             get { return estimateSet[index]; }
@@ -96,7 +101,7 @@ namespace FunWithWord
 
         public string[] ToStringArray()
         {
-            return new string[] { Name, resumeString.CurrentWorkers.ToString(), resumeString.CurrentMachine.ToString(), resumeString.CurrentMachineWorkers.ToString(),
+            return new string[] { filename, Code, Name, resumeString.CurrentWorkers.ToString(), resumeString.CurrentMachine.ToString(), resumeString.CurrentMachineWorkers.ToString(),
                                 resumeString.CurrentMaterials.ToString(), resumeString.CurrentCost.ToString(), Equipment.EquipmentCost.ToString(), Equipment.DepotCost.ToString(),
                                 Equipment.TransportCost.ToString(), resumeString.CurrentOverheads.ToString(), resumeString.CurrentProfit.ToString(), resumeString.CurrentTotalCost.ToString()};
         }

@@ -21,13 +21,12 @@ namespace FunWithWord
         public Dictionary<string, int> ValuesShift(string sheetName,        //name of sheet in document for searching
                                                     string rootElName,      //name of root element about which search is making
                                                     string[] shiftElNames,  //array of elements, which relative positions we need to find
-                                                    out int rootElColumn,   //returned column of root element for relief of searching this in whole estimate
-                                                    out int stringElCount)  //returned count of cells, which belong for this estimate string
+                                                    out int rootElColumn)   //returned column of root element for relief of searching this in whole estimate
         { 
             Worksheet stringSheet = templatesWorkbook.Worksheets[sheetName];            
             Range mainRange = stringSheet.get_Range(sheetName);                 //name of range with elements equals name of worksheet
             Dictionary<string, int> shiftDictionary = new Dictionary<string,int>();
-            stringElCount = 0;
+            int stringElCount = 0;
             rootElColumn = 0;
             int rootElPosition = 0;
             for (int i = 1; i <= mainRange.Rows.Count; i++)
